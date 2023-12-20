@@ -1,8 +1,20 @@
+import type { RootState } from "@/redux/store";
+import { increment } from "@/redux/features/login/loginSlice";
+import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 
 const Pricing = () => {
-  return (
-    <div>Pricing</div>
-  )
-}
+  const count = useAppSelector((state: RootState) => state.loginstate.value);
+  const dispatch = useAppDispatch();
 
-export default Pricing
+  return (
+    <div
+      onClick={() => {
+        dispatch(increment());
+      }}
+    >
+      {count}
+    </div>
+  );
+};
+
+export default Pricing;

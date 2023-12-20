@@ -2,7 +2,7 @@ import HomeLeftSide from "@/pages/home/components/HomeLeftSide";
 import HomeRightSide from "@/pages/home/components/HomeRightSide";
 import Features from "@/pages/home/components/Features";
 import Cards from "@/pages/home/components/Cards";
-import  Faq  from "@/pages/home/components/Faq";
+import Faq from "@/pages/home/components/Faq";
 
 const Home = () => {
   return (
