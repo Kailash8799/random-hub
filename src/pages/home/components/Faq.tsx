@@ -13,10 +13,10 @@ export default function Faq() {
           FAQs
         </h1>
       </div>
-      <div className="lg:mx-32 sm:mx-14 mx-2">
+      <div className="lg:mx-32 sm:mx-14 mx-5">
         <Accordion type="multiple"  className="w-full">
           <AccordionItem value="item-1">
-            <AccordionTrigger>
+            <AccordionTrigger className="items-start text-left">
               What Unveils the Magic of RandomHub?
             </AccordionTrigger>
             <AccordionContent>
@@ -29,7 +29,7 @@ export default function Faq() {
             </AccordionContent>
           </AccordionItem>
           <AccordionItem value="item-2">
-            <AccordionTrigger>
+            <AccordionTrigger className="items-start text-left">
               What Makes RandomHub Unique in Social Networking?
             </AccordionTrigger>
             <AccordionContent>
@@ -43,7 +43,7 @@ export default function Faq() {
             </AccordionContent>
           </AccordionItem>
           <AccordionItem value="item-3">
-            <AccordionTrigger>
+            <AccordionTrigger className="items-start text-left" >
               Why Choose RandomHub for Engaging with New Connections?
             </AccordionTrigger>
             <AccordionContent>
@@ -58,7 +58,7 @@ export default function Faq() {
             </AccordionContent>
           </AccordionItem>
           <AccordionItem value="item-4">
-            <AccordionTrigger>
+            <AccordionTrigger className="items-start text-left">
               Can I Use RandomHub Anytime and Anywhere?
             </AccordionTrigger>
             <AccordionContent>
@@ -73,7 +73,7 @@ export default function Faq() {
             </AccordionContent>
           </AccordionItem>
           <AccordionItem value="item-5">
-            <AccordionTrigger>Can I use RandomHub for free?</AccordionTrigger>
+            <AccordionTrigger className="items-start text-left">Can I use RandomHub for free?</AccordionTrigger>
             <AccordionContent>
               Absolutely! Monkey is available for free download on the Google
               Play Store, and you can enjoy its essential features, including

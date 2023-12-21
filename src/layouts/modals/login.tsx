@@ -1,33 +1,47 @@
-import { Button } from "@/components/ui/button";
-import {
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogTrigger,
-} from "@/components/ui/dialog";
+import { useCallback, useState } from "react";
+import Modal from "./modal";
+import type { RootState } from "@/redux/store";
+import { onClose } from "@/redux/features/login/loginSlice";
+import { onOpen } from "@/redux/features/signup/signupSlice";
+import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 
-const Login = () => {
+const LoginModal = () => {
+  const [isLoading, setIsLoading] = useState(false);
+  const onSubmit = () => {
+    setIsLoading(true);
+  };
+  const dispatch = useAppDispatch();
+  const isOpen = useAppSelector((state: RootState) => state.loginstate.isOpen);
+  const onToggle = useCallback(() => {
+    console.log("HEllo");
+    dispatch(onClose());
+    dispatch(onOpen());
+  }, [dispatch]);
+  const body = <div></div>;
+  const footer = (
+    <div>
+      <div className="text-center justify-center">
+        Dont have an account?{" "}
+        <span className="cursor-pointer" onClick={onToggle}>
+          Sign up here
+        </span>
+      </div>
+    </div>
+  );
   return (
     <>
-      <DialogHeader>
-        <DialogTitle>Login</DialogTitle>
-        <DialogDescription>
-          Make changes to your profile here. Click save when you're done.
-        </DialogDescription>
-      </DialogHeader>
-      <div className="grid gap-4 py-4">
-        <div className="grid grid-cols-4 items-center gap-4"></div>
-        <div className="grid grid-cols-4 items-center gap-4"></div>
-      </div>
-      <DialogFooter>
-        <Button type="submit">Save changes</Button>
-      </DialogFooter>
-      <DialogTrigger >
-        <Button type="submit">Signup</Button>
-      </DialogTrigger>
+      <Modal
+        title="Login"
+        isOpen={isOpen}
+        actionLabel="Signin"
+        onSubmit={onSubmit}
+        body={body}
+        disabled={isLoading}
+        footer={footer}
+        onClose={onClose}
+      />
     </>
   );
 };
 
-export default Login;
+export default LoginModal;

@@ -1,14 +1,14 @@
 import { createSlice } from '@reduxjs/toolkit'
-export interface LoginStateProps {
+export interface SignupState {
   isOpen: boolean
 }
 
-const initialState: LoginStateProps = {
+const initialState: SignupState = {
   isOpen: false,
 }
 
-export const loginSlice = createSlice({
-  name: 'loginstate',
+export const signupSlice = createSlice({
+  name: 'signupstate',
   initialState,
   reducers: {
     onOpen: (state) => {
@@ -20,6 +20,6 @@ export const loginSlice = createSlice({
   },
 })
 
-export const { onOpen, onClose } = loginSlice.actions
+export const { onOpen, onClose } = signupSlice.actions
 
-export default loginSlice.reducer
+export default signupSlice.reducer
