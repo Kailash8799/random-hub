@@ -12,6 +12,8 @@ const Modal: React.FC<ModalProps> = ({
   body,
   actionLabel,
   footer,
+  secondaryAction,
+  secondaryLabel,
 }) => {
   const [showModal, setShowModal] = useState(isOpen);
   const dispatch = useAppDispatch();
@@ -33,9 +35,10 @@ const Modal: React.FC<ModalProps> = ({
     onSubmit();
   }, [disabled, onSubmit]);
 
-  //   const handleSecondaryAction = useCallback(() => {
-  //     if (disabled || !secondaryAction) return;
-  //   }, [disabled, secondaryAction]);
+  const handleSecondaryAction = useCallback(() => {
+    if (disabled || !secondaryAction) return;
+    secondaryAction();
+  }, [disabled, secondaryAction]);
 
   if (!isOpen) return null;
 
@@ -63,8 +66,8 @@ const Modal: React.FC<ModalProps> = ({
         md:w-4/6 
         lg:w-3/6 
         xl:w-2/6 
-        my-6 
         mx-auto 
+        max-md:top-[20%]
         h-full 
         md:h-auto
         lg:h-auto
@@ -75,7 +78,7 @@ const Modal: React.FC<ModalProps> = ({
             className={`
                 translate 
                 duration-300
-                h-full
+                my-auto
                 ${showModal ? "translate-y-0" : "translate-y-full"}
                 ${showModal ? "opacity-100" : "opacity-0"}
             `}
@@ -96,6 +99,7 @@ const Modal: React.FC<ModalProps> = ({
               bg-white
               outline-none
               focus:outline-none
+              my-auto
             `}
             >
               {/* HEADER */}
@@ -118,9 +122,9 @@ const Modal: React.FC<ModalProps> = ({
                 <div className="text-lg font-semibold">{title}</div>
               </div>
               {/* BODY */}
-              <div className="relative p-6 flex-auto">{body}</div>
+              <div className="relative px-6 mt-5 py-2 flex-auto">{body}</div>
               {/* FOOTER */}
-              <div className="flex flex-col gap-2 p-6">
+              <div className="flex border-b-[1px] flex-col gap-2 p-6">
                 <div
                   className="
                     flex 
@@ -151,6 +155,40 @@ const Modal: React.FC<ModalProps> = ({
                      `}
                   >
                     {actionLabel}
+                  </button>
+                </div>
+              </div>
+              <div className="flex flex-col gap-2 p-6">
+                <div
+                  className="
+                    flex 
+                    flex-row 
+                    items-center 
+                    gap-4 
+                    w-full
+                    "
+                >
+                  <button
+                    disabled={disabled}
+                    onClick={handleSecondaryAction}
+                    className={`
+                        relative
+                        disabled:opacity-70
+                        disabled:cursor-not-allowed
+                        rounded-lg
+                        hover:opacity-80
+                        transition
+                        w-full
+                        bg-rose-500
+                        border-rose-500
+                        text-white
+                        text-base
+                        py-3
+                        font-semibold
+                        border-2
+                     `}
+                  >
+                    {secondaryLabel}
                   </button>
                 </div>
                 {footer}

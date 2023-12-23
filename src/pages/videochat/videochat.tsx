@@ -1,8 +1,15 @@
+import UserVideo from "./components/UserVideo";
 
 const Videochat = () => {
   return (
-    <div>Videochat</div>
-  )
-}
+    <>
+      <div>
+        <div>
+          <UserVideo />
+        </div>
+      </div>
+    </>
+  );
+};
 
-export default Videochat
+export default Videochat;

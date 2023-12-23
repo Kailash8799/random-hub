@@ -7,7 +7,14 @@ import { onOpen } from "@/redux/features/login/loginSlice";
 
 const SignupModal = () => {
   const [isLoading, setIsLoading] = useState(false);
+  const [email, setemail] = useState("");
+  const [password, setpassword] = useState("");
+
   const onSubmit = () => {
+    setIsLoading(true);
+  };
+
+  const onSecondaryAction = () => {
     setIsLoading(true);
   };
 
@@ -17,9 +24,42 @@ const SignupModal = () => {
     dispatch(onClose());
     dispatch(onOpen());
   }, [dispatch]);
-  const body = <div></div>;
+  const body = (
+    <div>
+      <div>
+          <input
+            placeholder="username"
+            className=" focus:border-[1px] border-[1px] focus:outline-none outline-none border-black placeholder:text-black w-full p-3 rounded-lg"
+            value={email}
+            onChange={(e) => {
+              setemail(e.target.value);
+            }}
+          />
+        </div>
+        <div className="mt-6">
+          <input
+            placeholder="email"
+            className=" focus:border-[1px] border-[1px] focus:outline-none outline-none border-black placeholder:text-black w-full p-3 rounded-lg"
+            value={email}
+            onChange={(e) => {
+              setemail(e.target.value);
+            }}
+          />
+        </div>
+        <div className="mt-6">
+          <input
+            placeholder="password"
+            className=" focus:border-[1px] border-[1px] focus:outline-none outline-none border-black placeholder:text-black w-full p-3 rounded-lg"
+            value={password}
+            onChange={(e) => {
+              setpassword(e.target.value);
+            }}
+          />
+        </div>
+      </div>
+  );
   const footer = (
-    <div className="mt-10">
+    <div className="">
       <div className="text-center justify-center">
         Already have an account?{" "}
         <span className="cursor-pointer font-semibold" onClick={onToggle}>
@@ -35,6 +75,8 @@ const SignupModal = () => {
         isOpen={isOpen}
         actionLabel="Signup"
         onSubmit={onSubmit}
+        secondaryAction={onSecondaryAction}
+        secondaryLabel="Google"
         body={body}
         disabled={isLoading}
         footer={footer}
