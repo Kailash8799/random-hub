@@ -1,39 +1,45 @@
 import { useCallback, useState } from "react";
 import Modal from "./modal";
-import { useAppDispatch, useAppSelector } from "@/redux/hooks";
-import { RootState } from "@/redux/store";
-import { onClose } from "@/redux/features/signup/signupSlice";
+import type { RootState } from "@/redux/store";
+import { onClose } from "@/redux/features/resetpassword/resetpasswordSlice";
 import { onOpen } from "@/redux/features/login/loginSlice";
+import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { useToast } from "@/components/ui/use-toast";
 import axios from "axios";
 
-const SignupModal = () => {
+const ResetPasswordModal = () => {
   const [isLoading, setIsLoading] = useState(false);
-  const [username, setusername] = useState("");
   const [email, setemail] = useState("");
-  const [password, setpassword] = useState("");
   const { toast } = useToast();
+
+  const dispatch = useAppDispatch();
+  const isOpen = useAppSelector(
+    (state: RootState) => state.resetpasswordstate.isOpen
+  );
+  const onToggle = useCallback(() => {
+    dispatch(onClose());
+    dispatch(onOpen());
+  }, [dispatch]);
 
   const onSubmit = async () => {
     setIsLoading(true);
     try {
-      if (username.length < 4 || email.length < 5 || password.length < 7) {
+      if (email.length < 5) {
         toast({
           title: "All fields required are reqiured",
-          description:
-            "username email and password required 5,6,8 character respectively",
+          description: "email and password required 6,8 character respectively",
         });
         setIsLoading(false);
         return;
       }
       const data = {
-        username,
         email,
-        password,
       };
       const res = await axios({
         method: "post",
-        url: `${import.meta.env.VITE_RANDOMHUB_BACKEND}/v1/users/signup`,
+        url: `${
+          import.meta.env.VITE_RANDOMHUB_BACKEND
+        }/v1/users/forgot/sendemail`,
         data: data,
       });
       if (res?.statusText !== "OK") {
@@ -50,8 +56,6 @@ const SignupModal = () => {
           description: "",
         });
         setemail("");
-        setpassword("");
-        setusername("");
         setIsLoading(false);
         return;
       } else {
@@ -71,30 +75,9 @@ const SignupModal = () => {
       return;
     }
   };
-
-  const onSecondaryAction = () => {
-    setIsLoading(true);
-  };
-
-  const dispatch = useAppDispatch();
-  const isOpen = useAppSelector((state: RootState) => state.signupstate.isOpen);
-  const onToggle = useCallback(() => {
-    dispatch(onClose());
-    dispatch(onOpen());
-  }, [dispatch]);
   const body = (
     <div>
       <div>
-        <input
-          placeholder="username"
-          className=" focus:border-[1px] border-[1px] focus:outline-none outline-none border-black placeholder:text-black w-full p-3 rounded-lg"
-          value={username}
-          onChange={(e) => {
-            setusername(e.target.value);
-          }}
-        />
-      </div>
-      <div className="mt-6">
         <input
           placeholder="email"
           className=" focus:border-[1px] border-[1px] focus:outline-none outline-none border-black placeholder:text-black w-full p-3 rounded-lg"
@@ -104,37 +87,25 @@ const SignupModal = () => {
           }}
         />
       </div>
-      <div className="mt-6">
-        <input
-          placeholder="password"
-          className=" focus:border-[1px] border-[1px] focus:outline-none outline-none border-black placeholder:text-black w-full p-3 rounded-lg"
-          value={password}
-          onChange={(e) => {
-            setpassword(e.target.value);
-          }}
-        />
-      </div>
     </div>
   );
   const footer = (
-    <div className="">
+    <div>
       <div className="text-center justify-center">
-        Already have an account?{" "}
-        <span className="cursor-pointer font-semibold" onClick={onToggle}>
+        Back to Sign in?{" "}
+        <span className="cursor-pointer" onClick={onToggle}>
           Login
-        </span>{" "}
+        </span>
       </div>
     </div>
   );
   return (
     <>
       <Modal
-        title="Signup"
+        title="Reset password"
         isOpen={isOpen}
-        actionLabel="Signup"
+        actionLabel="Reset"
         onSubmit={onSubmit}
-        secondaryAction={onSecondaryAction}
-        secondaryLabel="Google"
         body={body}
         disabled={isLoading}
         footer={footer}
@@ -144,4 +115,4 @@ const SignupModal = () => {
   );
 };
 
-export default SignupModal;
+export default ResetPasswordModal;

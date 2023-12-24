@@ -159,19 +159,20 @@ const Modal: React.FC<ModalProps> = ({
                 </div>
               </div>
               <div className="flex flex-col gap-2 p-6">
-                <div
-                  className="
+                {handleSecondaryAction && secondaryLabel && (
+                  <div
+                    className="
                     flex 
                     flex-row 
                     items-center 
                     gap-4 
                     w-full
                     "
-                >
-                  <button
-                    disabled={disabled}
-                    onClick={handleSecondaryAction}
-                    className={`
+                  >
+                    <button
+                      disabled={disabled}
+                      onClick={handleSecondaryAction}
+                      className={`
                         relative
                         disabled:opacity-70
                         disabled:cursor-not-allowed
@@ -187,10 +188,11 @@ const Modal: React.FC<ModalProps> = ({
                         font-semibold
                         border-2
                      `}
-                  >
-                    {secondaryLabel}
-                  </button>
-                </div>
+                    >
+                      {secondaryLabel}
+                    </button>
+                  </div>
+                )}
                 {footer}
               </div>
             </div>
