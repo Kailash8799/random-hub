@@ -21,7 +21,7 @@ const ResetPasswordModal = () => {
     dispatch(onOpen());
   }, [dispatch]);
 
-  const onSubmit = async () => {
+  const onSubmit = useCallback(async () => {
     setIsLoading(true);
     try {
       if (email.length < 5) {
@@ -74,7 +74,8 @@ const ResetPasswordModal = () => {
       setIsLoading(false);
       return;
     }
-  };
+  }, [email, toast]);
+
   const body = (
     <div>
       <div>

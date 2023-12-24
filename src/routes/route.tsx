@@ -7,6 +7,8 @@ import Safety from "@/pages/safety/safety";
 import { createBrowserRouter } from "react-router-dom";
 import { Layout } from "./layout";
 import Videochat from "@/pages/videochat/videochat";
+import EmailVerify from "@/pages/emailverify/verify";
+import ForgotPassword from "@/pages/forgotpassword/password";
 
 const router = createBrowserRouter([
   {
@@ -37,6 +39,14 @@ const router = createBrowserRouter([
       {
         path: "privacypolicy",
         element: <Policy />,
+      },
+      {
+        path: "verifyemail",
+        element: <EmailVerify />,
+      },
+      {
+        path: "resetpassword",
+        element: <ForgotPassword />,
       },
     ],
   },

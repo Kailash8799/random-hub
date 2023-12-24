@@ -14,7 +14,14 @@ const SignupModal = () => {
   const [password, setpassword] = useState("");
   const { toast } = useToast();
 
-  const onSubmit = async () => {
+  const dispatch = useAppDispatch();
+  const isOpen = useAppSelector((state: RootState) => state.signupstate.isOpen);
+  const onToggle = useCallback(() => {
+    dispatch(onClose());
+    dispatch(onOpen());
+  }, [dispatch]);
+
+  const onSubmit = useCallback(async () => {
     setIsLoading(true);
     try {
       if (username.length < 4 || email.length < 5 || password.length < 7) {
@@ -70,18 +77,12 @@ const SignupModal = () => {
       setIsLoading(false);
       return;
     }
-  };
+  }, [email, password, toast, username]);
 
-  const onSecondaryAction = () => {
+  const onSecondaryAction = useCallback(() => {
     setIsLoading(true);
-  };
+  }, []);
 
-  const dispatch = useAppDispatch();
-  const isOpen = useAppSelector((state: RootState) => state.signupstate.isOpen);
-  const onToggle = useCallback(() => {
-    dispatch(onClose());
-    dispatch(onOpen());
-  }, [dispatch]);
   const body = (
     <div>
       <div>

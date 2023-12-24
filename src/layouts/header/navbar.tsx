@@ -17,11 +17,11 @@ const Navbar = () => {
       <div className="sticky top-0 modal-backdrop flex md:px-5 items-center justify-between h-20 px-2 z-40">
         <Link to={"/"}>
           <div className="flex space-x-0.5 items-center justify-center">
-            <h1 className="font-extrabold  text- text-xl">Logo</h1>
-            {/* <h1 className="text-2xl text-black font-bold">Random</h1> */}
-            {/* <h1 className="text-2xl text-black bg-[#F49F0A] px-1.5 py-1 rounded-md font-bold">
+            {/* <h1 className="font-extrabold  text- text-xl">Logo</h1> */}
+            <h1 className="text-2xl text-black font-bold">Random</h1>
+            <h1 className="text-2xl text-black bg-[#F49F0A] px-1.5 py-1 rounded-md font-bold">
               hub
-            </h1> */}
+            </h1>
           </div>
         </Link>
         <div className="hidden items-center md:flex justify-center space-x-5">

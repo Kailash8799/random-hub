@@ -7,6 +7,7 @@ import { onOpen as onOpenForgot } from "@/redux/features/resetpassword/resetpass
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { useToast } from "@/components/ui/use-toast";
 import axios from "axios";
+import { onLogin } from "@/redux/features/authvalidation/loginstatus";
 
 const LoginModal = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -16,6 +17,7 @@ const LoginModal = () => {
 
   const dispatch = useAppDispatch();
   const isOpen = useAppSelector((state: RootState) => state.loginstate.isOpen);
+
   const onToggle = useCallback(() => {
     dispatch(onClose());
     dispatch(onOpen());
@@ -26,7 +28,7 @@ const LoginModal = () => {
     dispatch(onOpenForgot());
   }, [dispatch]);
 
-  const onSubmit = async () => {
+  const onSubmit = useCallback(async () => {
     setIsLoading(true);
     try {
       if (email.length < 5 || password.length < 7) {
@@ -59,9 +61,12 @@ const LoginModal = () => {
           title: res?.data?.message,
           description: "",
         });
+        localStorage.setItem("logintoken", res?.data?.token);
         setemail("");
         setpassword("");
         setIsLoading(false);
+        dispatch(onClose());
+        dispatch(onLogin());
         return;
       } else {
         toast({
@@ -79,10 +84,12 @@ const LoginModal = () => {
       setIsLoading(false);
       return;
     }
-  };
-  const onSecondaryAction = () => {
+  }, [dispatch, email, password, toast]);
+
+  const onSecondaryAction = useCallback(() => {
     setIsLoading(true);
-  };
+  }, []);
+
   const body = (
     <div>
       <div>
