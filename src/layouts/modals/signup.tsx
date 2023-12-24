@@ -4,14 +4,53 @@ import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { RootState } from "@/redux/store";
 import { onClose } from "@/redux/features/signup/signupSlice";
 import { onOpen } from "@/redux/features/login/loginSlice";
+import { ToastAction } from "@/components/ui/toast";
+import { useToast } from "@/components/ui/use-toast";
+import axios from "axios";
 
 const SignupModal = () => {
   const [isLoading, setIsLoading] = useState(false);
+  const [username, setusername] = useState("");
   const [email, setemail] = useState("");
   const [password, setpassword] = useState("");
+  const { toast } = useToast();
 
-  const onSubmit = () => {
+  const onSubmit = async () => {
     setIsLoading(true);
+    try {
+      if (username.length < 4 || email.length < 5 || password.length < 7) {
+        toast({
+          title: "All fields required are reqiured",
+          description:
+            "username email and password required 5,6,8 character respectively",
+          action: <ToastAction altText="">Remove</ToastAction>,
+        });
+        setIsLoading(false);
+        return;
+      }
+      const data = {
+        username,
+        email,
+        password,
+      };
+      const res = await axios({
+        method: "post",
+        url: `${import.meta.env.VITE_RANDOMHUB_BACKEND}/v1/users/signup`,
+        data: data,
+      });
+      console.log(res);
+    } catch (error) {
+      console.log(error);
+      toast({
+        title: "Scheduled: Catch up ",
+        description: "Friday, February 10, 2023 at 5:57 PM",
+        action: <ToastAction altText="Goto schedule to undo">Undo</ToastAction>,
+      });
+      setIsLoading(false);
+      return;
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const onSecondaryAction = () => {
@@ -27,36 +66,36 @@ const SignupModal = () => {
   const body = (
     <div>
       <div>
-          <input
-            placeholder="username"
-            className=" focus:border-[1px] border-[1px] focus:outline-none outline-none border-black placeholder:text-black w-full p-3 rounded-lg"
-            value={email}
-            onChange={(e) => {
-              setemail(e.target.value);
-            }}
-          />
-        </div>
-        <div className="mt-6">
-          <input
-            placeholder="email"
-            className=" focus:border-[1px] border-[1px] focus:outline-none outline-none border-black placeholder:text-black w-full p-3 rounded-lg"
-            value={email}
-            onChange={(e) => {
-              setemail(e.target.value);
-            }}
-          />
-        </div>
-        <div className="mt-6">
-          <input
-            placeholder="password"
-            className=" focus:border-[1px] border-[1px] focus:outline-none outline-none border-black placeholder:text-black w-full p-3 rounded-lg"
-            value={password}
-            onChange={(e) => {
-              setpassword(e.target.value);
-            }}
-          />
-        </div>
+        <input
+          placeholder="username"
+          className=" focus:border-[1px] border-[1px] focus:outline-none outline-none border-black placeholder:text-black w-full p-3 rounded-lg"
+          value={username}
+          onChange={(e) => {
+            setusername(e.target.value);
+          }}
+        />
       </div>
+      <div className="mt-6">
+        <input
+          placeholder="email"
+          className=" focus:border-[1px] border-[1px] focus:outline-none outline-none border-black placeholder:text-black w-full p-3 rounded-lg"
+          value={email}
+          onChange={(e) => {
+            setemail(e.target.value);
+          }}
+        />
+      </div>
+      <div className="mt-6">
+        <input
+          placeholder="password"
+          className=" focus:border-[1px] border-[1px] focus:outline-none outline-none border-black placeholder:text-black w-full p-3 rounded-lg"
+          value={password}
+          onChange={(e) => {
+            setpassword(e.target.value);
+          }}
+        />
+      </div>
+    </div>
   );
   const footer = (
     <div className="">
