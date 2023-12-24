@@ -6,10 +6,15 @@ import ResetPasswordModal from "@/layouts/modals/resetpassword";
 import { Toaster } from "@/components/ui/toaster";
 import { onLogin } from "@/redux/features/authvalidation/loginstatus";
 import { useEffect } from "react";
-import { useAppDispatch } from "@/redux/hooks";
+import { useAppDispatch, useAppSelector } from "@/redux/hooks";
+import { RootState } from "@/redux/store";
 
 function App() {
   const dispatch = useAppDispatch();
+  const isLogin = useAppSelector(
+    (state: RootState) => state.loginstatus.isLogin
+  );
+
   useEffect(() => {
     const token = localStorage.getItem("logintoken");
     if (token) {
@@ -19,9 +24,9 @@ function App() {
   return (
     <>
       <Toaster />
-      <ResetPasswordModal />
-      <LoginModal />
-      <SignupModal />
+      {!isLogin && <ResetPasswordModal />}
+      {!isLogin && <LoginModal />}
+      {!isLogin && <SignupModal />}
       <RouterProvider router={router} />
     </>
   );

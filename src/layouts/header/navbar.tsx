@@ -6,12 +6,19 @@ import {
   SheetContent,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { onOpen } from "@/redux/features/login/loginSlice";
-import { Menu } from "lucide-react";
-import { useAppDispatch } from "@/redux/hooks";
+import { onOpen as onLoginOpen } from "@/redux/features/login/loginSlice";
+import { onOpen as onSignupOpen } from "@/redux/features/signup/signupSlice";
+import { CircleUserRound, Menu } from "lucide-react";
+import { useAppDispatch, useAppSelector } from "@/redux/hooks";
+import { RootState } from "@/redux/store";
+import { onLogout } from "@/redux/features/authvalidation/loginstatus";
 
 const Navbar = () => {
   const dispatch = useAppDispatch();
+  const isLogin = useAppSelector(
+    (state: RootState) => state.loginstatus.isLogin
+  );
+
   return (
     <>
       <div className="sticky top-0 modal-backdrop flex md:px-5 items-center justify-between h-20 px-2 z-40">
@@ -36,14 +43,67 @@ const Navbar = () => {
           </Link>
         </div>
         <div className="flex items-center justify-center space-x-2">
-          <Button
-            color="black"
-            onClick={() => {
-              dispatch(onOpen());
-            }}
-          >
-            Try for free
-          </Button>
+          {!isLogin && (
+            <Button
+              color="black"
+              onClick={() => {
+                dispatch(onLoginOpen());
+              }}
+            >
+              Try for free
+            </Button>
+          )}
+          {isLogin && (
+            <>
+              <Sheet>
+                <SheetTrigger asChild>
+                  <CircleUserRound
+                    size={30}
+                    className="cursor-pointer md:mr-5 mr-2"
+                  />
+                </SheetTrigger>
+                <SheetContent>
+                  <div className="grid py-10 space-y-5">
+                    <SheetClose asChild>
+                      <Link
+                        to={"privacypolicy"}
+                        className="hover:bg-slate-200/50 rounded-lg p-2 pl-4"
+                      >
+                        <h1 className="text-xl font-semibold cursor-pointer">
+                          Privacy Policy
+                        </h1>
+                      </Link>
+                    </SheetClose>
+                    <SheetClose asChild>
+                      <Link
+                        to={"contact"}
+                        className="hover:bg-slate-200/50 rounded-lg p-2 pl-4"
+                      >
+                        <h1 className="text-xl font-semibold cursor-pointer">
+                          Contact
+                        </h1>
+                      </Link>
+                    </SheetClose>
+                    {isLogin && (
+                      <SheetClose asChild>
+                        <p
+                          onClick={() => {
+                            localStorage.removeItem("logintoken");
+                            dispatch(onLogout());
+                          }}
+                          className="hover:bg-slate-200/50 rounded-lg p-2 pl-4"
+                        >
+                          <h1 className="text-xl font-semibold cursor-pointer">
+                            Logout
+                          </h1>
+                        </p>
+                      </SheetClose>
+                    )}
+                  </div>
+                </SheetContent>
+              </Sheet>
+            </>
+          )}
           <div className="md:hidden">
             <Sheet>
               <SheetTrigger asChild>
@@ -101,26 +161,34 @@ const Navbar = () => {
                       </h1>
                     </Link>
                   </SheetClose>
-                  <SheetClose asChild>
-                    <Link
-                      to={"pricing"}
-                      className="hover:bg-slate-200/50 rounded-lg p-2 pl-4"
-                    >
-                      <h1 className="text-xl font-semibold cursor-pointer">
-                        Log in
-                      </h1>
-                    </Link>
-                  </SheetClose>
-                  <SheetClose asChild>
-                    <Link
-                      to={"pricing"}
-                      className="hover:bg-slate-200/50 rounded-lg p-2 pl-4"
-                    >
-                      <h1 className="text-xl font-semibold cursor-pointer">
-                        Sign up
-                      </h1>
-                    </Link>
-                  </SheetClose>
+                  {!isLogin && (
+                    <SheetClose asChild>
+                      <p
+                        onClick={() => {
+                          dispatch(onLoginOpen());
+                        }}
+                        className="hover:bg-slate-200/50 rounded-lg p-2 pl-4"
+                      >
+                        <h1 className="text-xl font-semibold cursor-pointer">
+                          Log in
+                        </h1>
+                      </p>
+                    </SheetClose>
+                  )}
+                  {!isLogin && (
+                    <SheetClose asChild>
+                      <p
+                        onClick={() => {
+                          dispatch(onSignupOpen());
+                        }}
+                        className="hover:bg-slate-200/50 rounded-lg p-2 pl-4"
+                      >
+                        <h1 className="text-xl font-semibold cursor-pointer">
+                          Sign up
+                        </h1>
+                      </p>
+                    </SheetClose>
+                  )}
                 </div>
               </SheetContent>
             </Sheet>
