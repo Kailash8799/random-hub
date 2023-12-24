@@ -43,8 +43,7 @@ const SignupModal = () => {
         url: `${import.meta.env.VITE_RANDOMHUB_BACKEND}/v1/users/signup`,
         data: data,
       });
-      if (res?.statusText !== "OK") {
-        console.log(res)
+      if (res?.status !== 200) {
         toast({
           title: "Error occured!",
           description: "",
@@ -81,7 +80,7 @@ const SignupModal = () => {
   }, [email, password, toast, username]);
 
   const onSecondaryAction = useCallback(() => {
-    setIsLoading(true);
+    setIsLoading(false);
   }, []);
 
   const body = (

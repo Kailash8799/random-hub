@@ -53,7 +53,7 @@ export default function ForgotPassword() {
         }/v1/users/forgot/resetpassword`,
         data: { token, password },
       });
-      if (res?.statusText !== "OK") {
+      if (res?.status !== 200) {
         toast({
           title: "Error occured!",
           description: "",

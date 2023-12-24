@@ -37,7 +37,7 @@ export default function EmailVerify() {
         }/v1/users/verifyemail/verify`,
         data: { token },
       });
-      if (res?.statusText !== "OK") {
+      if (res?.status !== 200) {
         toast({
           title: "Error occured!",
           description: "",

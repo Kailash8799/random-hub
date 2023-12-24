@@ -42,7 +42,7 @@ const ResetPasswordModal = () => {
         }/v1/users/forgot/sendemail`,
         data: data,
       });
-      if (res?.statusText !== "OK") {
+      if (res?.status !== 200) {
         toast({
           title: "Error occured!",
           description: "",

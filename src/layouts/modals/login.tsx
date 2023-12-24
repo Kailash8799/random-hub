@@ -48,7 +48,7 @@ const LoginModal = () => {
         url: `${import.meta.env.VITE_RANDOMHUB_BACKEND}/v1/users/signin`,
         data: data,
       });
-      if (res?.statusText !== "OK") {
+      if (res?.status !== 200) {
         toast({
           title: "Error occured!",
           description: "",
@@ -87,7 +87,8 @@ const LoginModal = () => {
   }, [dispatch, email, password, toast]);
 
   const onSecondaryAction = useCallback(() => {
-    setIsLoading(true);
+    setIsLoading(false);
+    /** empty */
   }, []);
 
   const body = (
