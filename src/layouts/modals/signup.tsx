@@ -44,6 +44,7 @@ const SignupModal = () => {
         data: data,
       });
       if (res?.statusText !== "OK") {
+        console.log(res)
         toast({
           title: "Error occured!",
           description: "",
