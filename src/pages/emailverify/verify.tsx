@@ -3,8 +3,14 @@ import { motion } from "framer-motion";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useToast } from "@/components/ui/use-toast";
 import axios from "axios";
+import { useAppSelector } from "@/redux/hooks";
+import { RootState } from "@/redux/store";
 
 export default function EmailVerify() {
+  const isLogin = useAppSelector(
+    (state: RootState) => state.loginstatus.isLogin
+  );
+
   const searchParams = useSearchParams();
   const [loading, setloading] = useState(false);
   const [disabled, setdisabled] = useState(true);
@@ -14,8 +20,7 @@ export default function EmailVerify() {
   const { toast } = useToast();
 
   useEffect(() => {
-    const logintoken = localStorage.getItem("logintoken");
-    if (logintoken) {
+    if (isLogin) {
       navigate("/", { replace: true });
     }
     setmounted(true);
@@ -24,7 +29,7 @@ export default function EmailVerify() {
     if (token) {
       setdisabled(false);
     }
-  }, [navigate, searchParams, token]);
+  }, [isLogin, navigate, searchParams, token]);
 
   const verifyEmailAddress = useCallback(async () => {
     if (!mounted) return;

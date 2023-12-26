@@ -17,10 +17,21 @@ function App() {
 
   useEffect(() => {
     const token = localStorage.getItem("logintoken");
+    console.log("Use Effect");
     if (token) {
-      dispatch(onLogin());
+      dispatch(
+        onLogin({
+          gender: "MALE",
+          isLogin: true,
+          location: "INDIA",
+          premiumuser: false,
+          username: "Kailash",
+          interest: "GIRLS",
+        })
+      );
     }
   }, [dispatch]);
+
   return (
     <>
       <Toaster />

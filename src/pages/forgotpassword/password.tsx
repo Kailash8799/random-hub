@@ -3,8 +3,14 @@ import { motion } from "framer-motion";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useToast } from "@/components/ui/use-toast";
 import axios from "axios";
+import { useAppSelector } from "@/redux/hooks";
+import { RootState } from "@/redux/store";
 
 export default function ForgotPassword() {
+  const isLogin = useAppSelector(
+    (state: RootState) => state.loginstatus.isLogin
+  );
+
   const searchParams = useSearchParams();
   const [loading, setloading] = useState(false);
   const [disabled, setdisabled] = useState(true);
@@ -16,8 +22,7 @@ export default function ForgotPassword() {
   const { toast } = useToast();
 
   useEffect(() => {
-    const logintoken = localStorage.getItem("logintoken");
-    if (logintoken) {
+    if (isLogin) {
       navigate("/", { replace: true });
     }
     setmounted(true);
@@ -26,10 +31,10 @@ export default function ForgotPassword() {
     if (token) {
       setdisabled(false);
     }
-  }, [navigate, searchParams, token]);
+  }, [isLogin, navigate, searchParams, token]);
 
   const resetPassword = useCallback(async () => {
-    if (!mounted) return;
+    if (!mounted || !token) return;
     setloading(true);
     try {
       if (password.length < 7 || cpassword.length < 7) {

@@ -54,7 +54,7 @@ const Navbar = () => {
             </Button>
           )}
           {isLogin && (
-            <>
+            <div className="hidden md:block">
               <Sheet>
                 <SheetTrigger asChild>
                   <CircleUserRound
@@ -102,7 +102,7 @@ const Navbar = () => {
                   </div>
                 </SheetContent>
               </Sheet>
-            </>
+            </div>
           )}
           <div className="md:hidden">
             <Sheet>
@@ -185,6 +185,21 @@ const Navbar = () => {
                       >
                         <h1 className="text-xl font-semibold cursor-pointer">
                           Sign up
+                        </h1>
+                      </p>
+                    </SheetClose>
+                  )}
+                  {isLogin && (
+                    <SheetClose asChild>
+                      <p
+                        onClick={() => {
+                          localStorage.removeItem("logintoken");
+                          dispatch(onLogout());
+                        }}
+                        className="hover:bg-slate-200/50 rounded-lg p-2 pl-4"
+                      >
+                        <h1 className="text-xl font-semibold cursor-pointer">
+                          Logout
                         </h1>
                       </p>
                     </SheetClose>

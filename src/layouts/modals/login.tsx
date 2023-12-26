@@ -8,6 +8,8 @@ import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { useToast } from "@/components/ui/use-toast";
 import axios from "axios";
 import { onLogin } from "@/redux/features/authvalidation/loginstatus";
+import { jwtDecode } from "jwt-decode";
+import { JWTDECODEPROPS } from "@/types/props/jwtprops";
 
 const LoginModal = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -62,11 +64,20 @@ const LoginModal = () => {
           description: "",
         });
         localStorage.setItem("logintoken", res?.data?.token);
+        const tokenDecoded: JWTDECODEPROPS = jwtDecode(res?.data?.token);
+        const data = {
+          gender: tokenDecoded?.gender,
+          isLogin: true,
+          location: tokenDecoded?.location,
+          premiumuser: tokenDecoded?.premiumuser as boolean,
+          username: tokenDecoded?.name,
+          interest: tokenDecoded?.interest,
+        };
         setemail("");
         setpassword("");
         setIsLoading(false);
         dispatch(onClose());
-        dispatch(onLogin());
+        dispatch(onLogin(data));
         return;
       } else {
         toast({
@@ -88,7 +99,6 @@ const LoginModal = () => {
 
   const onSecondaryAction = useCallback(() => {
     setIsLoading(false);
-    /** empty */
   }, []);
 
   const body = (
