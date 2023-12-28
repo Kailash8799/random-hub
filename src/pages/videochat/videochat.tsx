@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import UserVideo from "./components/UserVideo";
-import { useNavigate } from "react-router-dom";
+// import { useNavigate } from "react-router-dom";
 import { useAppSelector } from "@/redux/hooks";
 import { RootState } from "@/redux/store";
 import { useSocket } from "@/hooks/socket/socket";
@@ -23,14 +23,14 @@ const Videochat = () => {
   const isLogin = useAppSelector(
     (state: RootState) => state.loginstatus
   );
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
 
   useEffect(() => {
     setmounted(true);
-    if (!(isLogin.isLogin)) {
-      navigate("/", { replace: true });
-    }
-  }, [isLogin.isLogin, navigate]);
+    // if (!(isLogin.isLogin)) {
+    //   navigate("/", { replace: true });
+    // }
+  }, []);
 
   const getLocalStream = useCallback(async () => {
     try {
