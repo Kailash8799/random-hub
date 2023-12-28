@@ -72,11 +72,11 @@ const Videochat = () => {
   const handleCallAccepted = useCallback(async ({ from, answer }: { from: string, answer: RTCSessionDescriptionInit }) => {
     setremotesocketid(from)
     await peer?.setLocalDescription(answer);
-    // if (localstream == undefined) return;
-    // for (const track of localstream?.getTracks() ?? []) {
-    //   peer.peer?.addTrack(track);
-    // }
-  }, [])
+    if (localstream == undefined) return;
+    for (const track of localstream?.getTracks() ?? []) {
+      peer.peer?.addTrack(track);
+    }
+  }, [localstream])
 
 
   const handleNegoNeedIncomming = useCallback(
