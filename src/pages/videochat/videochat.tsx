@@ -66,6 +66,11 @@ const Videochat = () => {
   }, [socketio]);
 
   const handleIncomingCall = useCallback(async ({ from, offer }: { from: string, offer: RTCSessionDescriptionInit }) => {
+    const stream = await navigator.mediaDevices.getUserMedia({
+      audio: true,
+      video: true,
+    });
+    setlocalstream(stream);
     setremotesocketid(from)
     const answer = await peer?.getAnswer(offer);
     socketio?.emit("call:accepted", { to: from, answer })
@@ -78,11 +83,11 @@ const Videochat = () => {
     await peer?.setLocalDescription(answer);
     console.log("handleCallAccepted")
     console.log(from, answer)
-    // if (localstream == undefined) return;
-    // for (const track of localstream?.getTracks() ?? []) {
-    //   peer.peer?.addTrack(track);
-    // }
-  }, [])
+    if (localstream == undefined) return;
+    for (const track of localstream?.getTracks() ?? []) {
+      peer.peer?.addTrack(track);
+    }
+  }, [localstream])
 
 
   const handleNegoNeedIncomming = useCallback(
