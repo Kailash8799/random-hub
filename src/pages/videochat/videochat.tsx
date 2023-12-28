@@ -34,13 +34,13 @@ const Videochat = () => {
 
   const getLocalStream = useCallback(async () => {
     try {
-      const lstream = await navigator.mediaDevices.getUserMedia({ audio: false, video: true });
-      const rmstream = new MediaStream();
+      const lstream = await navigator.mediaDevices.getUserMedia({ audio: true, video: true });
+      // const rmstream = new MediaStream();
       if (lstream == null || lstream == undefined) {
         setvideopermission(false)
         return;
       }
-      setremotestream(rmstream)
+      // setremotestream(rmstream)
       setvideopermission(true);
       setlocalstream(lstream);
       lstream.getTracks().forEach((track) => {
@@ -60,6 +60,8 @@ const Videochat = () => {
     if (data.id) {
       const offer = await peer.getOffer();
       socketio?.emit("user:call", { to: data.id, offer })
+      console.log("handleUserJoin")
+      console.log(data)
     }
   }, [socketio]);
 
@@ -67,34 +69,44 @@ const Videochat = () => {
     setremotesocketid(from)
     const answer = await peer?.getAnswer(offer);
     socketio?.emit("call:accepted", { to: from, answer })
+    console.log("handleIncomingCall");
+    console.log(from, offer, answer)
   }, [socketio])
 
   const handleCallAccepted = useCallback(async ({ from, answer }: { from: string, answer: RTCSessionDescriptionInit }) => {
     setremotesocketid(from)
     await peer?.setLocalDescription(answer);
-    if (localstream == undefined) return;
-    for (const track of localstream?.getTracks() ?? []) {
-      peer.peer?.addTrack(track);
-    }
-  }, [localstream])
+    console.log("handleCallAccepted")
+    console.log(from, answer)
+    // if (localstream == undefined) return;
+    // for (const track of localstream?.getTracks() ?? []) {
+    //   peer.peer?.addTrack(track);
+    // }
+  }, [])
 
 
   const handleNegoNeedIncomming = useCallback(
     async ({ from, offer }: { from: string, offer: RTCSessionDescriptionInit }) => {
       const ans = await peer.getAnswer(offer);
       socketio?.emit("peer:nego:done", { to: from, ans });
+      console.log("handleNegoNeedIncomming")
+      console.log(from, offer)
     },
     [socketio]
   );
 
   const handleNegoNeedFinal = useCallback(async ({ ans }: { ans: RTCSessionDescriptionInit }) => {
     await peer.setLocalDescription(ans);
+    console.log("handleNegoNeedFinal")
+    console.log(ans)
   }, []);
 
 
   const addRemotetrack = (ev: RTCTrackEvent) => {
     const stream = ev.streams;
     setremotestream(stream[0]);
+    console.log("addRemotetrack")
+    console.log(stream)
   }
 
   useEffect(() => {
