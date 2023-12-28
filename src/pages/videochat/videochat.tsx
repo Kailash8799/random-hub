@@ -92,7 +92,7 @@ const Videochat = () => {
   }, []);
 
 
-  const addRemotetrack = (ev: { streams: MediaStream[]; }) => {
+  const addRemotetrack = (ev: RTCTrackEvent) => {
     const stream = ev.streams;
     setremotestream(stream[0]);
   }
