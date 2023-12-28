@@ -134,3 +134,7 @@ body {
 .img-container {
   position: relative;
 }
+
+.textoverflow{
+  overflow-wrap: break-word !important;
+}

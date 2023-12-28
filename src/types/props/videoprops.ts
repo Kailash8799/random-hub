@@ -1,3 +1,4 @@
 export interface VideoProps{
-    src:string
+    src: MediaStream|null|undefined;
+    videopermission?:boolean;
 }
