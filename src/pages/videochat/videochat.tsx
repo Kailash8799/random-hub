@@ -68,9 +68,9 @@ const Videochat = () => {
   const handleIncomingCall = useCallback(async ({ from, offer }: { from: string, offer: RTCSessionDescriptionInit }) => {
     setremotesocketid(from)
     const answer = await peer?.getAnswer(offer);
-    socketio?.emit("call:accepted", { to: from, answer })
     console.log("handleIncomingCall");
     console.log(from, offer, answer)
+    socketio?.emit("call:accepted", { to: from, answer })
   }, [socketio])
 
   const handleCallAccepted = useCallback(async ({ from, answer }: { from: string, answer: RTCSessionDescriptionInit }) => {
@@ -95,9 +95,9 @@ const Videochat = () => {
   const handleNegoNeedIncomming = useCallback(
     async ({ from, offer }: { from: string, offer: RTCSessionDescriptionInit }) => {
       const ans = await peer.getAnswer(offer);
-      socketio?.emit("peer:nego:done", { to: from, ans });
       console.log("handleNegoNeedIncomming")
       console.log(from, offer)
+      socketio?.emit("peer:nego:done", { to: from, ans });
     },
     [socketio]
   );
@@ -120,6 +120,7 @@ const Videochat = () => {
     peer.peer?.addEventListener("track", addRemotetrack);
     return () => {
       peer.peer?.removeEventListener("track", addRemotetrack);
+      peer.peer?.close();
     }
   }, [])
 
@@ -141,8 +142,8 @@ const Videochat = () => {
     }
     socketio.on("room:join", handleJoinRoom);
     socketio.on("user:joined", handleUserJoin);
-    socketio.on("incoming:call", handleIncomingCall);
-    socketio.on("call:accepted", handleCallAccepted);
+    socketio.on("incoming:call", handleIncomingCall); // offer
+    socketio.on("call:accepted", handleCallAccepted); // answer
     socketio.on("peer:nego:needed", handleNegoNeedIncomming);
     socketio.on("peer:nego:final", handleNegoNeedFinal);
     socketio.on('ice-candidate', (candidate) => {
