@@ -1,9 +1,7 @@
 import React, { createContext, useMemo } from "react";
 import { Socket, io } from "socket.io-client";
 
-
 export const SocketContext = createContext<{ socketio: Socket | null }>({ socketio: null });
-
 
 interface ClientOnlyProps {
     children: React.ReactNode;

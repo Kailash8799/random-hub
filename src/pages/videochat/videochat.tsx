@@ -58,45 +58,33 @@ const Videochat = () => {
   const handleUserJoin = useCallback(async (data: { name: string, id: string }) => {
     setremotesocketid(data.id)
     if (data.id) {
+      if (peer.peer) {
+        peer.peer.onicecandidate = (e: RTCPeerConnectionIceEvent) => {
+          if (e.candidate) {
+            socketio?.emit("ice-candidate", { id: data.id, candidate: e.candidate });
+          }
+        }
+      }
       const offer = await peer.getOffer();
       socketio?.emit("user:call", { to: data.id, offer })
-      console.log("handleUserJoin")
-      console.log(data)
     }
   }, [socketio]);
 
   const handleIncomingCall = useCallback(async ({ from, offer }: { from: string, offer: RTCSessionDescriptionInit }) => {
     setremotesocketid(from)
     const answer = await peer?.getAnswer(offer);
-    console.log("handleIncomingCall");
-    console.log(from, offer, answer)
     socketio?.emit("call:accepted", { to: from, answer })
   }, [socketio])
 
   const handleCallAccepted = useCallback(async ({ from, answer }: { from: string, answer: RTCSessionDescriptionInit }) => {
     setremotesocketid(from)
     await peer?.setLocalDescription(answer);
-    console.log("handleCallAccepted")
-    console.log(from, answer)
-    if (peer.peer) {
-      peer.peer.onicecandidate = (e: RTCPeerConnectionIceEvent) => {
-        if (e.candidate) {
-          socketio?.emit("ice-candidate", { id: remotesocketid, candidate: e.candidate });
-        }
-      }
-    }
-    // if (localstream == undefined) return;
-    // for (const track of localstream?.getTracks() ?? []) {
-    //   peer.peer?.addTrack(track);
-    // }
-  }, [remotesocketid, socketio])
+  }, [])
 
 
   const handleNegoNeedIncomming = useCallback(
     async ({ from, offer }: { from: string, offer: RTCSessionDescriptionInit }) => {
       const ans = await peer.getAnswer(offer);
-      console.log("handleNegoNeedIncomming")
-      console.log(from, offer)
       socketio?.emit("peer:nego:done", { to: from, ans });
     },
     [socketio]
@@ -104,16 +92,12 @@ const Videochat = () => {
 
   const handleNegoNeedFinal = useCallback(async ({ ans }: { ans: RTCSessionDescriptionInit }) => {
     await peer.setLocalDescription(ans);
-    console.log("handleNegoNeedFinal")
-    console.log(ans)
   }, []);
 
 
   const addRemotetrack = (ev: RTCTrackEvent) => {
     const stream = ev.streams;
     setremotestream(stream[0]);
-    console.log("addRemotetrack")
-    console.log(stream)
   }
 
   useEffect(() => {
@@ -130,11 +114,18 @@ const Videochat = () => {
   }, [remotesocketid, socketio]);
 
   useEffect(() => {
+    if (peer.peer) {
+      peer.peer.onicecandidate = (e: RTCPeerConnectionIceEvent) => {
+        if (e.candidate) {
+          socketio?.emit("ice-candidate", { id: remotesocketid, candidate: e.candidate });
+        }
+      }
+    }
     peer.peer?.addEventListener("negotiationneeded", handleNegoNeeded);
     return () => {
       peer.peer?.removeEventListener("negotiationneeded", handleNegoNeeded);
     };
-  }, [handleNegoNeeded]);
+  }, [handleNegoNeeded, remotesocketid, socketio]);
 
   useEffect(() => {
     if (socketio == null) {
