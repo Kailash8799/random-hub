@@ -36,7 +36,7 @@ class PeerService {
 
     async getAnswer(offer: RTCSessionDescriptionInit) {
         if (this.peer != undefined && this.peer != null && this.peer) {
-            await this.peer.setRemoteDescription(offer);
+            await this.peer.setRemoteDescription(new RTCSessionDescription(offer));
             const ans = await this.peer.createAnswer();
             await this.peer.setLocalDescription(new RTCSessionDescription(ans));
             return ans;

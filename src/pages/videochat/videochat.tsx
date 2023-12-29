@@ -66,11 +66,6 @@ const Videochat = () => {
   }, [socketio]);
 
   const handleIncomingCall = useCallback(async ({ from, offer }: { from: string, offer: RTCSessionDescriptionInit }) => {
-    const stream = await navigator.mediaDevices.getUserMedia({
-      audio: true,
-      video: true,
-    });
-    setlocalstream(stream);
     setremotesocketid(from)
     const answer = await peer?.getAnswer(offer);
     socketio?.emit("call:accepted", { to: from, answer })
@@ -83,11 +78,18 @@ const Videochat = () => {
     await peer?.setLocalDescription(answer);
     console.log("handleCallAccepted")
     console.log(from, answer)
-    if (localstream == undefined) return;
-    for (const track of localstream?.getTracks() ?? []) {
-      peer.peer?.addTrack(track);
+    if (peer.peer) {
+      peer.peer.onicecandidate = (e: RTCPeerConnectionIceEvent) => {
+        if (e.candidate) {
+          socketio?.emit("ice-candidate", { id: remotesocketid, candidate: e.candidate });
+        }
+      }
     }
-  }, [localstream])
+    // if (localstream == undefined) return;
+    // for (const track of localstream?.getTracks() ?? []) {
+    //   peer.peer?.addTrack(track);
+    // }
+  }, [remotesocketid, socketio])
 
 
   const handleNegoNeedIncomming = useCallback(
@@ -143,6 +145,9 @@ const Videochat = () => {
     socketio.on("call:accepted", handleCallAccepted);
     socketio.on("peer:nego:needed", handleNegoNeedIncomming);
     socketio.on("peer:nego:final", handleNegoNeedFinal);
+    socketio.on('ice-candidate', (candidate) => {
+      peer.peer?.addIceCandidate(candidate);
+    });
     return () => {
       socketio.off("room:join", handleJoinRoom)
       socketio.off("user:joined", handleUserJoin)
