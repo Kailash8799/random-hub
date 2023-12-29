@@ -81,7 +81,6 @@ const Videochat = () => {
     await peer?.setLocalDescription(answer);
   }, [])
 
-
   const handleNegoNeedIncomming = useCallback(
     async ({ from, offer }: { from: string, offer: RTCSessionDescriptionInit }) => {
       const ans = await peer.getAnswer(offer);
@@ -114,13 +113,13 @@ const Videochat = () => {
   }, [remotesocketid, socketio]);
 
   useEffect(() => {
-    if (peer.peer) {
-      peer.peer.onicecandidate = (e: RTCPeerConnectionIceEvent) => {
-        if (e.candidate) {
-          socketio?.emit("ice-candidate", { id: remotesocketid, candidate: e.candidate });
-        }
-      }
-    }
+    // if (peer.peer) {
+    //   peer.peer.onicecandidate = (e: RTCPeerConnectionIceEvent) => {
+    //     if (e.candidate) {
+    //       socketio?.emit("ice-candidate", { id: remotesocketid, candidate: e.candidate });
+    //     }
+    //   }
+    // }
     peer.peer?.addEventListener("negotiationneeded", handleNegoNeeded);
     return () => {
       peer.peer?.removeEventListener("negotiationneeded", handleNegoNeeded);
