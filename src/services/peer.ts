@@ -48,14 +48,6 @@ class PeerService {
             await this.peer.setRemoteDescription(new RTCSessionDescription(ans));
         }
     }
-
-    // async setRemoteOffer(remoteoffer: RTCSessionDescriptionInit) {
-    //     if (this.peer != undefined && this.peer != null && this.peer) {
-    //         await this.peer.setRemoteDescription(new RTCSessionDescription(remoteoffer));
-    //         const ans = this.peer.createAnswer()
-    //         return ans;
-    //     }
-    // }
 }
 
 export default new PeerService();

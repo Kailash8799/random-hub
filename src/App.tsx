@@ -8,6 +8,8 @@ import { onLogin } from "@/redux/features/authvalidation/loginstatus";
 import { useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { RootState } from "@/redux/store";
+import { jwtDecode } from "jwt-decode";
+import { JWTDECODEPROPS } from "./types/props/jwtprops";
 
 function App() {
   const dispatch = useAppDispatch();
@@ -17,18 +19,18 @@ function App() {
 
   useEffect(() => {
     const token = localStorage.getItem("logintoken");
-    console.log("Use Effect");
     if (token) {
-      dispatch(
-        onLogin({
-          gender: "MALE",
-          isLogin: true,
-          location: "INDIA",
-          premiumuser: false,
-          username: "Kailash",
-          interest: "GIRLS",
-        })
-      );
+      const tokenDecoded: JWTDECODEPROPS = jwtDecode(token);
+      const data = {
+        gender: tokenDecoded?.gender,
+        isLogin: true,
+        location: tokenDecoded?.location,
+        premiumuser: tokenDecoded?.premiumuser as boolean,
+        username: tokenDecoded?.name,
+        interest: tokenDecoded?.interest,
+        email: tokenDecoded?.email
+      };
+      dispatch(onLogin(data));
     }
   }, [dispatch]);
 

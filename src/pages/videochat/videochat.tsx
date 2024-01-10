@@ -181,7 +181,7 @@ const Videochat = () => {
 
   const startRandomCall = useCallback(() => {
     if (socketio?.connected) {
-      socketio?.emit("room:join", { name: isLogin.username, gender: isLogin.gender, location: isLogin.location });
+      socketio?.emit("room:join", { name: isLogin.username, gender: isLogin.gender, location: isLogin.location, remoteId: null });
     }
   }, [isLogin.gender, isLogin.location, isLogin.username, socketio])
 

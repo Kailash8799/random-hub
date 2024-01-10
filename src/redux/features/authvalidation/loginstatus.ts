@@ -6,6 +6,7 @@ export interface LoginStatusStateProps {
     premiumuser: boolean,
     interest?: string,
     gender: string,
+    email?: string
 }
 
 const initialState: LoginStatusStateProps = {
@@ -15,6 +16,7 @@ const initialState: LoginStatusStateProps = {
     premiumuser: false,
     username: "Guest",
     interest: "ALL",
+    email: undefined
 }
 
 export const loginStatusSlice = createSlice({
@@ -22,7 +24,8 @@ export const loginStatusSlice = createSlice({
     initialState,
     reducers: {
         onLogin: (state, action: PayloadAction<LoginStatusStateProps>) => {
-            state.isLogin = true;
+            state.email = action.payload.email;
+            state.isLogin = action.payload.isLogin;
             state.gender = action.payload.gender;
             state.location = action.payload.location;
             state.premiumuser = action.payload.premiumuser;

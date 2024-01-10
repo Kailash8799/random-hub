@@ -5,4 +5,5 @@ export interface JWTDECODEPROPS {
     username: string;
     interest: string;
     name: string;
+    email:string
 }

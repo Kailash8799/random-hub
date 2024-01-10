@@ -72,6 +72,7 @@ const LoginModal = () => {
           premiumuser: tokenDecoded?.premiumuser as boolean,
           username: tokenDecoded?.name,
           interest: tokenDecoded?.interest,
+          email:tokenDecoded?.email
         };
         setemail("");
         setpassword("");

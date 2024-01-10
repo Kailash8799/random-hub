@@ -86,7 +86,7 @@ const Navbar = () => {
                     </SheetClose>
                     {isLogin && (
                       <SheetClose asChild>
-                        <p
+                        <div
                           onClick={() => {
                             localStorage.removeItem("logintoken");
                             dispatch(onLogout());
@@ -96,7 +96,7 @@ const Navbar = () => {
                           <h1 className="text-xl font-semibold cursor-pointer">
                             Logout
                           </h1>
-                        </p>
+                        </div>
                       </SheetClose>
                     )}
                   </div>
@@ -163,7 +163,7 @@ const Navbar = () => {
                   </SheetClose>
                   {!isLogin && (
                     <SheetClose asChild>
-                      <p
+                      <div
                         onClick={() => {
                           dispatch(onLoginOpen());
                         }}
@@ -172,12 +172,12 @@ const Navbar = () => {
                         <h1 className="text-xl font-semibold cursor-pointer">
                           Log in
                         </h1>
-                      </p>
+                      </div>
                     </SheetClose>
                   )}
                   {!isLogin && (
                     <SheetClose asChild>
-                      <p
+                      <div
                         onClick={() => {
                           dispatch(onSignupOpen());
                         }}
@@ -186,12 +186,12 @@ const Navbar = () => {
                         <h1 className="text-xl font-semibold cursor-pointer">
                           Sign up
                         </h1>
-                      </p>
+                      </div>
                     </SheetClose>
                   )}
                   {isLogin && (
                     <SheetClose asChild>
-                      <p
+                      <div
                         onClick={() => {
                           localStorage.removeItem("logintoken");
                           dispatch(onLogout());
@@ -201,7 +201,7 @@ const Navbar = () => {
                         <h1 className="text-xl font-semibold cursor-pointer">
                           Logout
                         </h1>
-                      </p>
+                      </div>
                     </SheetClose>
                   )}
                 </div>
