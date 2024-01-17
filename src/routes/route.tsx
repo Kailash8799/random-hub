@@ -9,6 +9,7 @@ import { Layout } from "./layout";
 import Videochat from "@/pages/videochat/videochat";
 import EmailVerify from "@/pages/emailverify/verify";
 import ForgotPassword from "@/pages/forgotpassword/password";
+import Error from "@/pages/error/error";
 
 const router = createBrowserRouter([
   {
@@ -54,6 +55,10 @@ const router = createBrowserRouter([
     path: "/videochat",
     element: <Videochat />,
   },
+  {
+    path: "*",
+    element: <Error />
+  }
 ]);
 
 export default router;

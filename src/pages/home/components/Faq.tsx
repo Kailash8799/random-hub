@@ -1,90 +1,37 @@
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
+import { questions } from "@/constant/faq";
 
 export default function Faq() {
+
   return (
     <>
-      <div>
-        <h1 className="text-black text-center mt-10 font-bold text-6xl">
-          FAQs
-        </h1>
-      </div>
       <div className="lg:mx-32 sm:mx-14 mx-5">
-        <Accordion type="multiple"  className="w-full">
-          <AccordionItem value="item-1">
-            <AccordionTrigger className="items-start text-left">
-              What Unveils the Magic of RandomHub?
-            </AccordionTrigger>
-            <AccordionContent>
-              Monkey refers to a world-leading social product designed to offer
-              a unique social experience. While "monkey" is a term that also
-              denotes animals like primates in English, in this context, we
-              specifically refer to an engaging social platform. This intriguing
-              nomenclature simultaneously reflects the product's liveliness and
-              its nature as a social medium.
-            </AccordionContent>
-          </AccordionItem>
-          <AccordionItem value="item-2">
-            <AccordionTrigger className="items-start text-left">
-              What Makes RandomHub Unique in Social Networking?
-            </AccordionTrigger>
-            <AccordionContent>
-              Monkey sets itself apart by prioritizing authentic face-to-face
-              interactions through real-time 1-on-1 video chats. This approach
-              goes beyond conventional text-based conversations, allowing users
-              to establish immediate and meaningful connections with others.
-              This distinctive emphasis on engaging in random video chats sets
-              Monkey apart from other social networking platforms, creating an
-              exciting and genuine social experience.
-            </AccordionContent>
-          </AccordionItem>
-          <AccordionItem value="item-3">
-            <AccordionTrigger className="items-start text-left" >
-              Why Choose RandomHub for Engaging with New Connections?
-            </AccordionTrigger>
-            <AccordionContent>
-              Monkey offers a feature-rich platform, akin to well-established
-              social chat platforms like Omegle, OmeTV, Chatroulette, and
-              AzarLive. What truly sets Monkey apart is its unwavering
-              commitment to excellence in social networking. It aims to provide
-              the most polished alternative, emphasizing user experience,
-              safety, and the opportunity to engage in lively conversations,
-              connecting you with strangers from around the world. With Monkey,
-              you can easily talk to strangers and make new connections.
-            </AccordionContent>
-          </AccordionItem>
-          <AccordionItem value="item-4">
-            <AccordionTrigger className="items-start text-left">
-              Can I Use RandomHub Anytime and Anywhere?
-            </AccordionTrigger>
-            <AccordionContent>
-              Monkey offers the best of both worlds, allowing users to
-              seamlessly connect with new people using its mobile app or
-              website. Whether you're on the move or at your computer, Monkey's
-              adaptability ensures a hassle-free experience for everyone.
-              Additionally, Monkey's broad accessibility and focus on
-              spontaneous video chats provide you with the opportunity to
-              interact freely with others, no matter the time or location, while
-              ensuring your safety.
-            </AccordionContent>
-          </AccordionItem>
-          <AccordionItem value="item-5">
-            <AccordionTrigger className="items-start text-left">Can I use RandomHub for free?</AccordionTrigger>
-            <AccordionContent>
-              Absolutely! Monkey is available for free download on the Google
-              Play Store, and you can enjoy its essential features, including
-              random chat and video calls, without any charges. While the core
-              features are accessible to all users without cost, we also offer
-              optional in-app purchases for premium features. These premium
-              options are designed to enhance your social experience and provide
-              you with even more ways to connect and interact on Monkey.
-            </AccordionContent>
-          </AccordionItem>
-        </Accordion>
+      </div>
+      <div className="bg-white py-6 sm:py-8 lg:py-12">
+        <div className="mx-auto max-w-screen-xl px-4 md:px-8">
+          <div className="mb-10 md:mb-16">
+            <h2 className="mb-4 text-center text-4xl font-bold text-gray-800 md:mb-6 lg:text-5xl">Frequently asked questions</h2>
+
+            <p className="mx-auto max-w-screen-md text-center text-gray-500 md:text-lg">This is a section of some simple filler text, also known as placeholder text. It shares some characteristics of a real written text but is random or otherwise generated.</p>
+          </div>
+
+          <div className="grid gap-4 sm:grid-cols-2 md:gap-8">
+            {questions.map((item, ind) => {
+              return <div key={ind} className="rounded-lg bg-gray-100 p-5">
+                <div className="mb-4 flex items-center justify-between gap-4 border-b pb-4">
+                  <h3 className="font-semibold text-indigo-500 sm:text-lg md:text-xl">{item.que}?</h3>
+
+                  <span className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gray-300 text-gray-500">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z" clipRule="evenodd" />
+                    </svg>
+                  </span>
+                </div>
+
+                <p className="text-gray-500">{item.ans}</p>
+              </div>
+            })}
+          </div>
+        </div>
       </div>
     </>
   );
