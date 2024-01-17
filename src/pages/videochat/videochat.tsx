@@ -239,6 +239,11 @@ const Videochat = () => {
     alert("Removed")
   }, []);
 
+  const handleSkipUser = useCallback(() => {
+    setLobby(true);
+    alert("Skipped")
+  }, [])
+
   // useEffect(() => {
   //   // if (peer.peer) {
   //   //   peer.peer.onicecandidate = (e: RTCPeerConnectionIceEvent) => {
@@ -265,6 +270,7 @@ const Videochat = () => {
     socketio.on("lobby", handleLobby);
     socketio.on("add-ice-candidate", handleAddIceCandidate);
     socketio.on("remotedisconnect", handleRemoteDisconnect);
+    socketio.on("user:skiped", handleSkipUser);
     return () => {
       socketio.off("room:join", handleJoinRoom)
       // socketio.off("user:joined", handleUserJoin)
@@ -274,8 +280,9 @@ const Videochat = () => {
       socketio.off("lobby", handleLobby);
       socketio.off("add-ice-candidate", handleAddIceCandidate);
       socketio.off("remotedisconnect", handleRemoteDisconnect);
+      socketio.off("user:skiped", handleSkipUser);
     };
-  }, [handleAddIceCandidate, handleAnswer, handleJoinRoom, handleLobby, handleOffer, handleRemoteDisconnect, handleSendOffer, socketio]);
+  }, [handleAddIceCandidate, handleAnswer, handleJoinRoom, handleLobby, handleOffer, handleRemoteDisconnect, handleSendOffer, handleSkipUser, socketio]);
 
   useEffect(() => {
     if (!mounted) return;
@@ -301,9 +308,13 @@ const Videochat = () => {
     setmessage("");
   }, [isLogin.username, message, socketio])
 
-  const startRandomCall = useCallback(() => {
 
-  }, [])
+
+  const startRandomCall = useCallback(() => {
+    if (socketio !== null) {
+      socketio?.emit("skip:user")
+    }
+  }, [socketio])
 
   if (!mounted) return;
 
