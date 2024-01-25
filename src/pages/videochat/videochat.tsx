@@ -6,6 +6,7 @@ import { RootState } from "@/redux/store";
 import { useSocket } from "@/hooks/socket/socket";
 import { BadgeMinus, Filter, Send, SkipForward } from "lucide-react";
 import { MessageChatProps } from "@/types/props/chat";
+import { iceServers } from "@/services/peer";
 // import peer from "@/services/peer";
 
 const Videochat = () => {
@@ -13,6 +14,7 @@ const Videochat = () => {
   // const [onlineusers, setonlineusers] = useState(0);
   const onlineusers = 0;
   const [message, setmessage] = useState("")
+  const [roomId, setroomId] = useState<string | null>(null)
   const [allmessages, setallmessages] = useState<MessageChatProps[]>([]);
   // const [localstream, setlocalstream] = useState<MediaStream>();
   // const [remotestream, setremotestream] = useState<MediaStream>();
@@ -94,7 +96,7 @@ const Videochat = () => {
   const handleSendOffer = useCallback(async ({ roomId }: { roomId: string }) => {
     console.log("sending offer");
     setLobby(false);
-    const pc = new RTCPeerConnection();
+    const pc = new RTCPeerConnection(iceServers);
     setSendingPc(pc);
     if (localVideoTrack) {
       console.error("added tack");
@@ -134,11 +136,11 @@ const Videochat = () => {
   const handleOffer = useCallback(async ({ roomId, sdp: remoteSdp }: { roomId: string, sdp: RTCSessionDescriptionInit }) => {
     console.log("received offer");
     setLobby(false);
-    const pc = new RTCPeerConnection();
+    const pc = new RTCPeerConnection(iceServers);
     pc.setRemoteDescription(remoteSdp)
     const sdp = await pc.createAnswer();
-
     pc.setLocalDescription(sdp)
+
     const stream = new MediaStream();
     if (remoteVideoRef.current) {
       remoteVideoRef.current.srcObject = stream;
@@ -164,28 +166,39 @@ const Videochat = () => {
       sdp: sdp
     });
 
-    setTimeout(() => {
+    setTimeout(async () => {
       const track1 = pc.getTransceivers()[0].receiver.track
       const track2 = pc.getTransceivers()[1].receiver.track
-      if (remoteVideoRef.current !== null && remoteVideoRef.current !== undefined) {
-        remoteVideoRef.current.srcObject = new MediaStream();
-        remoteVideoRef.current.srcObject.addTrack(track1)
+      console.log(track1)
+      console.log(track2)
+      try {
 
-        remoteVideoRef.current.srcObject.addTrack(track2)
-        remoteVideoRef.current.play();
+        if (remoteVideoRef.current !== null && remoteVideoRef.current !== undefined) {
+          remoteVideoRef.current.srcObject = new MediaStream();
+          console.log("added track in remote from")
+          remoteVideoRef.current.srcObject.addTrack(track1)
+
+          remoteVideoRef.current.srcObject.addTrack(track2)
+          // await remoteVideoRef.current.play();
+        }
+
+      } catch (error) {
+        console.log("Log error", error)
       }
     }, 3000)
 
   }, [socketio])
 
-  const handleAnswer = useCallback(async ({ roomId, sdp: remoteSdp }: { roomId: string, sdp: RTCSessionDescriptionInit }) => {
+  const handleAnswer = useCallback(async ({ roomId, sdp: remoteSdp, id }: { roomId: string, sdp: RTCSessionDescriptionInit, id: string }) => {
     setLobby(false);
-    setSendingPc(pc => {
-      pc?.setRemoteDescription(remoteSdp)
-      return pc;
+    setroomId(id);
+    console.log("getting answer" + remoteSdp)
+    setSendingPc(() => {
+      sendingPc?.setRemoteDescription(remoteSdp)
+      return sendingPc;
     });
     console.log("loop closed" + roomId);
-  }, [])
+  }, [sendingPc])
 
   const handleAddIceCandidate = useCallback(
     async ({ candidate, type }: { candidate: RTCIceCandidateInit, type: string }) => {
@@ -236,13 +249,43 @@ const Videochat = () => {
 
   const handleRemoteDisconnect = useCallback(async () => {
     setLobby(true);
-    alert("Removed")
-  }, []);
+    setallmessages([]);
+    setSendingPc(() => {
+      if (sendingPc?.connectionState !== "failed" && sendingPc?.connectionState !== "closed") {
+        sendingPc?.close()
+      }
+      return null;
+    });
+    setReceivingPc(() => {
+      if (receivingPc?.connectionState !== "failed" && receivingPc?.connectionState !== "closed") {
+        receivingPc?.close()
+      }
+      return null;
+    });
+  }, [receivingPc, sendingPc]);
 
   const handleSkipUser = useCallback(() => {
     setLobby(true);
-    alert("Skipped")
-  }, [])
+    setallmessages([]);
+    setSendingPc(() => {
+      if (sendingPc?.connectionState !== "failed" && sendingPc?.connectionState !== "closed") {
+        sendingPc?.close()
+      }
+      return null;
+    });
+    setReceivingPc(() => {
+      if (receivingPc?.connectionState !== "failed" && receivingPc?.connectionState !== "closed") {
+        receivingPc?.close()
+      }
+      return null;
+    });
+  }, [receivingPc, sendingPc])
+
+  const handleGetMessage = useCallback(({ message }: { message: string }) => {
+    console.log(message);
+    const newarr: MessageChatProps[] = [...allmessages, { name: "Remote", message }]
+    setallmessages(newarr);
+  }, [allmessages])
 
   // useEffect(() => {
   //   // if (peer.peer) {
@@ -271,6 +314,7 @@ const Videochat = () => {
     socketio.on("add-ice-candidate", handleAddIceCandidate);
     socketio.on("remotedisconnect", handleRemoteDisconnect);
     socketio.on("user:skiped", handleSkipUser);
+    socketio.on("getMessage", handleGetMessage);
     return () => {
       socketio.off("room:join", handleJoinRoom)
       // socketio.off("user:joined", handleUserJoin)
@@ -281,8 +325,9 @@ const Videochat = () => {
       socketio.off("add-ice-candidate", handleAddIceCandidate);
       socketio.off("remotedisconnect", handleRemoteDisconnect);
       socketio.off("user:skiped", handleSkipUser);
+      socketio.off("getMessage", handleGetMessage);
     };
-  }, [handleAddIceCandidate, handleAnswer, handleJoinRoom, handleLobby, handleOffer, handleRemoteDisconnect, handleSendOffer, handleSkipUser, socketio]);
+  }, [handleAddIceCandidate, handleAnswer, handleGetMessage, handleJoinRoom, handleLobby, handleOffer, handleRemoteDisconnect, handleSendOffer, handleSkipUser, socketio]);
 
   useEffect(() => {
     if (!mounted) return;
@@ -299,22 +344,36 @@ const Videochat = () => {
     if (socketio == null) {
       return;
     }
-    if (message.length <= 0) {
+    if (lobby) {
       return;
     }
-    const sendmessage: MessageChatProps = { message: message, name: isLogin.username }
+    if (message.length <= 0 || roomId === null || roomId === undefined) {
+      return;
+    }
+    const sendmessage: MessageChatProps = { message: message, name: "You" }
     setallmessages((oldmessage) => [...oldmessage, sendmessage])
-    socketio.emit("userdata", sendmessage)
+    socketio.emit("sendMessage", { roomId, message })
     setmessage("");
-  }, [isLogin.username, message, socketio])
-
-
+  }, [message, socketio, roomId, lobby])
 
   const startRandomCall = useCallback(() => {
     if (socketio !== null) {
       socketio?.emit("skip:user")
     }
-  }, [socketio])
+    setallmessages([]);
+    setReceivingPc(() => {
+      if (receivingPc?.connectionState !== "failed" && receivingPc?.connectionState !== "closed") {
+        receivingPc?.close()
+      }
+      return null;
+    });
+    setSendingPc(() => {
+      if (sendingPc?.connectionState !== "failed" && sendingPc?.connectionState !== "closed") {
+        sendingPc?.close()
+      }
+      return null;
+    });
+  }, [receivingPc, sendingPc, socketio])
 
   if (!mounted) return;
 
@@ -379,7 +438,7 @@ const Videochat = () => {
 
         <div className="fixed select-none lg:bottom-0 flex lg:flex-row max-lg:flex-col max-lg:top-0 lg:justify-around lg:items-center max-lg:w-full lg:w-[50%] left-0 z-50  lg:h-32 items-end max-lg:space-y-3">
 
-          <button onClick={startRandomCall} className="lg:bg-green-300/50 font-bold lg:text-2xl lg:h-28 lg:shadow-lg shadow-green-600 lg:w-28 rounded-lg max-lg:mr-3 max-lg:mt-3">
+          <button disabled={lobby} onClick={startRandomCall} className="lg:bg-green-300/50 font-bold lg:text-2xl lg:h-28 lg:shadow-lg disabled:lg:bg-green-300/20 shadow-green-600 lg:w-28 rounded-lg max-lg:mr-3 max-lg:mt-3">
             <span className="hidden lg:block text-2xl text-white">Skip</span>
             <span className="lg:hidden">
               <SkipForward size={30} color="white" />
