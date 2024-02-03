@@ -8,7 +8,7 @@ interface ClientOnlyProps {
 }
 
 const SocketProvider: React.FC<ClientOnlyProps> = ({ children }) => {
-    const socketio = useMemo(() => io(import.meta.env.VITE_RANDOMHUB_BACKEND, { transports: ["websocket"] }), []);
+    const socketio = useMemo(() => io(import.meta.env.VITE_RANDOMHUB_BACKEND, { transports: ["websocket"], autoConnect: true, }), []);
     return <SocketContext.Provider value={{ socketio }} > {children} </SocketContext.Provider>
 }
 
