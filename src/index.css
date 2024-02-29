@@ -138,3 +138,7 @@ body {
 .textoverflow{
   overflow-wrap: break-word !important;
 }
+
+.transformvideo{
+  transform: scaleX(-1);
+}
