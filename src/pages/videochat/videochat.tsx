@@ -1,22 +1,20 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 // import UserVideo from "./components/UserVideo";
 // import { useNavigate } from "react-router-dom";
 import { useAppSelector } from "@/redux/hooks";
 import { RootState } from "@/redux/store";
-// import { useSocket } from "@/hooks/socket/socket";
+import { useSocket } from "@/hooks/socket/socket";
 import { BadgeMinus, Filter, Send, SkipForward } from "lucide-react";
 import { MessageChatProps } from "@/types/props/chat";
 import { iceServers } from "@/services/peer";
-import { io } from "socket.io-client";
 // import peer from "@/services/peer";
 
 const Videochat = () => {
   const [mounted, setmounted] = useState(false);
-  // const [socket, setsocket] = useState(null);
   // const [onlineusers, setonlineusers] = useState(0);
   const onlineusers = 0;
-  const [message, setmessage] = useState("");
-  const [roomId, setroomId] = useState<string | null>(null);
+  const [message, setmessage] = useState("")
+  const [roomId, setroomId] = useState<string | null>(null)
   const [allmessages, setallmessages] = useState<MessageChatProps[]>([]);
   // const [localstream, setlocalstream] = useState<MediaStream>();
   // const [remotestream, setremotestream] = useState<MediaStream>();
@@ -24,35 +22,20 @@ const Videochat = () => {
   const [lobby, setLobby] = useState(true);
   // const [remotesocketid, setremotesocketid] = useState<string>();
   const [sendingPc, setSendingPc] = useState<null | RTCPeerConnection>(null);
-  const [receivingPc, setReceivingPc] = useState<null | RTCPeerConnection>(
-    null
-  );
-  const [localAudioTrack, setLocalAudioTrack] =
-    useState<MediaStreamTrack | null>(null);
-  const [localVideoTrack, setlocalVideoTrack] =
-    useState<MediaStreamTrack | null>(null);
+  const [receivingPc, setReceivingPc] = useState<null | RTCPeerConnection>(null);
+  const [localAudioTrack, setLocalAudioTrack] = useState<MediaStreamTrack | null>(null);
+  const [localVideoTrack, setlocalVideoTrack] = useState<MediaStreamTrack | null>(null);
   // const [remoteVideoTrack, setRemoteVideoTrack] = useState<MediaStreamTrack | null>(null);
   // const [remoteAudioTrack, setRemoteAudioTrack] = useState<MediaStreamTrack | null>(null);
   // const [remoteMediaStream, setRemoteMediaStream] = useState<MediaStream | null>(null);
   const remoteVideoRef = useRef<HTMLVideoElement>(null);
   const localVideoRef = useRef<HTMLVideoElement>(null);
 
-  // const { socketio } = useSocket();
-  const isLogin = useAppSelector((state: RootState) => state.loginstatus);
-  // const navigate = useNavigate();
-
-  const socketio = useMemo(
-    () =>
-      io(import.meta.env.VITE_RANDOMHUB_BACKEND, {
-        transports: ["websocket"],
-        autoConnect: true,
-      }),
-    []
+  const { socketio } = useSocket();
+  const isLogin = useAppSelector(
+    (state: RootState) => state.loginstatus
   );
-  useEffect(()=>{
-    console.log(sendingPc)
-    console.log(receivingPc)
-  },[sendingPc,receivingPc])
+  // const navigate = useNavigate();
 
   useEffect(() => {
     setmounted(true);
@@ -63,52 +46,37 @@ const Videochat = () => {
 
   const getLocalStream = useCallback(async () => {
     try {
-      const lstream = await navigator.mediaDevices.getUserMedia({
-        audio: { echoCancellation: true },
-        video: {
-          aspectRatio: 1,
-          facingMode: "environment",
-          autoGainControl: true,
-        },
-      });
+      const lstream = await navigator.mediaDevices.getUserMedia({ audio: true, video: true });
       // const rmstream = new MediaStream();
       if (lstream == null || lstream == undefined) {
-        setvideopermission(false);
+        setvideopermission(false)
         return;
       }
       setvideopermission(true);
       // setlocalstream(lstream);
       if (localVideoRef.current) {
-        localVideoRef.current.srcObject = lstream;
+        localVideoRef.current.srcObject = lstream
       }
-      const audioTrack = lstream.getAudioTracks()[0];
-      const videoTrack = lstream.getVideoTracks()[0];
+      const audioTrack = lstream.getAudioTracks()[0]
+      const videoTrack = lstream.getVideoTracks()[0]
       setLocalAudioTrack(audioTrack);
       setlocalVideoTrack(videoTrack);
       if (socketio?.connected) {
-        socketio?.emit("room:join", {
-          name: isLogin.username,
-          gender: isLogin.gender,
-          location: isLogin.location,
-          remoteId: null,
-        });
+        socketio?.emit("room:join", { name: isLogin.username, gender: isLogin.gender, location: isLogin.location, remoteId: null });
       }
     } catch (error) {
       setvideopermission(false);
     }
-  }, [isLogin, socketio]);
+  }, [isLogin, socketio])
 
   useEffect(() => {
     if (!mounted) return;
-    getLocalStream();
-  }, [getLocalStream, mounted]);
+    getLocalStream()
+  }, [getLocalStream, mounted])
 
-  const handleJoinRoom = useCallback(
-    async (data: { name: string; gender: string; location: string }) => {
-      console.log(data);
-    },
-    []
-  );
+  const handleJoinRoom = useCallback(async (data: { name: string, gender: string, location: string }) => {
+    console.log(data);
+  }, []);
 
   // const handleUserJoin = useCallback(async (data: { name: string, id: string }) => {
   //   setremotesocketid(data.id)
@@ -125,163 +93,136 @@ const Videochat = () => {
   //   }
   // }, [socketio]);
 
-  const handleSendOffer = useCallback(
-    async ({ roomId }: { roomId: string }) => {
-      console.log("sending offer");
-      setLobby(false);
-      const pc = new RTCPeerConnection(iceServers);
-      setSendingPc(pc);
-      if (localVideoTrack) {
-        console.error("added tack");
-        console.log(localVideoTrack);
-        pc.addTrack(localVideoTrack);
+  const handleSendOffer = useCallback(async ({ roomId }: { roomId: string }) => {
+    console.log("sending offer");
+    setLobby(false);
+    const pc = new RTCPeerConnection(iceServers);
+    setSendingPc(pc);
+    if (localVideoTrack) {
+      console.error("added tack");
+      console.log(localVideoTrack)
+      pc.addTrack(localVideoTrack)
+    }
+    if (localAudioTrack) {
+      console.error("added tack");
+      console.log(localAudioTrack)
+      pc.addTrack(localAudioTrack)
+    }
+
+    pc.onicecandidate = async (e) => {
+      console.log("receiving ice candidate locally");
+      if (e.candidate) {
+        socketio?.emit("add-ice-candidate", {
+          candidate: e.candidate,
+          type: "sender",
+          roomId
+        })
       }
-      if (localAudioTrack) {
-        console.error("added tack");
-        console.log(localAudioTrack);
-        pc.addTrack(localAudioTrack);
+    }
+
+    pc.onnegotiationneeded = async () => {
+      console.log("on negotiation neeeded, sending offer");
+      const sdp = await pc.createOffer();
+      pc.setLocalDescription(sdp)
+      socketio?.emit("offer", {
+        sdp,
+        roomId
+      })
+    }
+
+  }, [localAudioTrack, localVideoTrack, socketio])
+
+
+  const handleOffer = useCallback(async ({ roomId, sdp: remoteSdp }: { roomId: string, sdp: RTCSessionDescriptionInit }) => {
+    console.log("received offer");
+    setLobby(false);
+    const pc = new RTCPeerConnection(iceServers);
+    pc.setRemoteDescription(remoteSdp)
+    const sdp = await pc.createAnswer();
+    pc.setLocalDescription(sdp)
+
+    const stream = new MediaStream();
+    if (remoteVideoRef.current) {
+      remoteVideoRef.current.srcObject = stream;
+    }
+    setReceivingPc(pc);
+
+    pc.onicecandidate = async (e) => {
+      if (!e.candidate) {
+        return;
       }
+      console.log("omn ice candidate on receiving side");
+      if (e.candidate) {
+        socketio?.emit("add-ice-candidate", {
+          candidate: e.candidate,
+          type: "receiver",
+          roomId
+        })
+      }
+    }
 
-      pc.onicecandidate = async (e) => {
-        console.log("receiving ice candidate locally");
-        if (e.candidate) {
-          socketio?.emit("add-ice-candidate", {
-            candidate: e.candidate,
-            type: "sender",
-            roomId,
-          });
-        }
-      };
-
-      pc.onnegotiationneeded = async () => {
-        console.log("on negotiation neeeded, sending offer");
-        const sdp = await pc.createOffer();
-        pc.setLocalDescription(sdp);
-        socketio?.emit("offer", {
-          sdp,
-          roomId,
-        });
-      };
-    },
-    [localAudioTrack, localVideoTrack, socketio]
-  );
-
-  const handleOffer = useCallback(
-    async ({
+    socketio?.emit("answer", {
       roomId,
-      sdp: remoteSdp,
-    }: {
-      roomId: string;
-      sdp: RTCSessionDescriptionInit;
-    }) => {
-      console.log("received offer");
-      setLobby(false);
-      const pc = new RTCPeerConnection(iceServers);
-      pc.setRemoteDescription(remoteSdp);
-      const sdp = await pc.createAnswer();
-      pc.setLocalDescription(sdp);
+      sdp: sdp
+    });
 
-      const stream = new MediaStream();
-      if (remoteVideoRef.current) {
-        remoteVideoRef.current.srcObject = stream;
+    setTimeout(async () => {
+      const track1 = pc.getTransceivers()[0].receiver.track
+      const track2 = pc.getTransceivers()[1].receiver.track
+      console.log(track1)
+      console.log(track2)
+      try {
+
+        if (remoteVideoRef.current !== null && remoteVideoRef.current !== undefined) {
+          remoteVideoRef.current.srcObject = new MediaStream();
+          console.log("added track in remote from")
+          remoteVideoRef.current.srcObject.addTrack(track1)
+
+          remoteVideoRef.current.srcObject.addTrack(track2)
+          // await remoteVideoRef.current.play();
+        }
+
+      } catch (error) {
+        console.log("Log error", error)
       }
-      setReceivingPc(pc);
+    }, 3000)
 
-      pc.onicecandidate = async (e) => {
-        if (!e.candidate) {
-          return;
-        }
-        console.log("omn ice candidate on receiving side");
-        if (e.candidate) {
-          socketio?.emit("add-ice-candidate", {
-            candidate: e.candidate,
-            type: "receiver",
-            roomId,
-          });
-        }
-      };
+  }, [socketio])
 
-      socketio?.emit("answer", {
-        roomId,
-        sdp: sdp,
-      });
-
-      setTimeout(async () => {
-        const track1 = pc.getTransceivers()[0].receiver.track;
-        const track2 = pc.getTransceivers()[1].receiver.track;
-        console.log(track1);
-        console.log(track2);
-        try {
-          if (
-            remoteVideoRef.current !== null &&
-            remoteVideoRef.current !== undefined
-          ) {
-            remoteVideoRef.current.srcObject = new MediaStream();
-            console.log("added track in remote from");
-            remoteVideoRef.current.srcObject.addTrack(track1);
-
-            remoteVideoRef.current.srcObject.addTrack(track2);
-            // await remoteVideoRef.current.play();
-          }
-        } catch (error) {
-          console.log("Log error here ", error);
-        }
-      }, 3000);
-    },
-    [socketio]
-  );
-
-  const handleAnswer = useCallback(
-    async ({
-      roomId,
-      sdp: remoteSdp,
-      id,
-    }: {
-      roomId: string;
-      sdp: RTCSessionDescriptionInit;
-      id: string;
-    }) => {
-      setLobby(false);
-      setroomId(id);
-      console.log("getting answer" + remoteSdp);
-      setSendingPc((sendingPc1) => {
-        sendingPc1?.setRemoteDescription(remoteSdp);
-        return sendingPc1;
-      });
-      console.log("loop closed" + roomId);
-    },
-    []
-  );
+  const handleAnswer = useCallback(async ({ roomId, sdp: remoteSdp, id }: { roomId: string, sdp: RTCSessionDescriptionInit, id: string }) => {
+    setLobby(false);
+    setroomId(id);
+    console.log("getting answer" + remoteSdp)
+    setSendingPc(() => {
+      sendingPc?.setRemoteDescription(remoteSdp)
+      return sendingPc;
+    });
+    console.log("loop closed" + roomId);
+  }, [sendingPc])
 
   const handleAddIceCandidate = useCallback(
-    async ({
-      candidate,
-      type,
-    }: {
-      candidate: RTCIceCandidateInit;
-      type: string;
-    }) => {
+    async ({ candidate, type }: { candidate: RTCIceCandidateInit, type: string }) => {
       console.log("add ice candidate from remote");
-      console.log({ candidate, type });
+      console.log({ candidate, type })
       if (type == "sender") {
-        setReceivingPc((receivingPc1) => {
-          if (!receivingPc1) {
-            console.error("receicng pc nout found");
+        setReceivingPc(() => {
+          if (!receivingPc) {
+            console.error("receicng pc nout found")
           }
-          receivingPc1?.addIceCandidate(candidate);
-          return receivingPc1;
+          receivingPc?.addIceCandidate(candidate)
+          return receivingPc;
         });
       } else {
-        setSendingPc((sendingPc1) => {
-          if (!sendingPc1) {
-            console.error("sending pc nout found");
+        setSendingPc(() => {
+          if (!sendingPc) {
+            console.error("sending pc nout found")
           }
-          sendingPc1?.addIceCandidate(candidate);
-          return sendingPc1;
+          sendingPc?.addIceCandidate(candidate)
+          return sendingPc;
         });
       }
     },
-    []
+    [receivingPc, sendingPc]
   );
 
   // const addRemotetrack = (ev: RTCTrackEvent) => {
@@ -309,60 +250,42 @@ const Videochat = () => {
   const handleRemoteDisconnect = useCallback(async () => {
     setLobby(true);
     setallmessages([]);
-    setSendingPc((sendingPc1) => {
-      if (
-        sendingPc1?.connectionState !== "failed" &&
-        sendingPc1?.connectionState !== "closed"
-      ) {
-        sendingPc1?.close();
+    setSendingPc(() => {
+      if (sendingPc?.connectionState !== "failed" && sendingPc?.connectionState !== "closed") {
+        sendingPc?.close()
       }
       return null;
     });
-    setReceivingPc((receivingPc1) => {
-      if (
-        receivingPc1?.connectionState !== "failed" &&
-        receivingPc1?.connectionState !== "closed"
-      ) {
-        receivingPc1?.close();
+    setReceivingPc(() => {
+      if (receivingPc?.connectionState !== "failed" && receivingPc?.connectionState !== "closed") {
+        receivingPc?.close()
       }
       return null;
     });
-  }, []);
+  }, [receivingPc, sendingPc]);
 
   const handleSkipUser = useCallback(() => {
     setLobby(true);
     setallmessages([]);
-    setSendingPc((sendingPc1) => {
-      if (
-        sendingPc1?.connectionState !== "failed" &&
-        sendingPc1?.connectionState !== "closed"
-      ) {
-        sendingPc1?.close();
+    setSendingPc(() => {
+      if (sendingPc?.connectionState !== "failed" && sendingPc?.connectionState !== "closed") {
+        sendingPc?.close()
       }
       return null;
     });
-    setReceivingPc((receivingPc1) => {
-      if (
-        receivingPc1?.connectionState !== "failed" &&
-        receivingPc1?.connectionState !== "closed"
-      ) {
-        receivingPc1?.close();
+    setReceivingPc(() => {
+      if (receivingPc?.connectionState !== "failed" && receivingPc?.connectionState !== "closed") {
+        receivingPc?.close()
       }
       return null;
     });
-  }, []);
+  }, [receivingPc, sendingPc])
 
-  const handleGetMessage = useCallback(
-    ({ message }: { message: string }) => {
-      console.log(message);
-      const newarr: MessageChatProps[] = [
-        ...allmessages,
-        { name: "Remote", message },
-      ];
-      setallmessages(newarr);
-    },
-    [allmessages]
-  );
+  const handleGetMessage = useCallback(({ message }: { message: string }) => {
+    console.log(message);
+    const newarr: MessageChatProps[] = [...allmessages, { name: "Remote", message }]
+    setallmessages(newarr);
+  }, [allmessages])
 
   // useEffect(() => {
   //   // if (peer.peer) {
@@ -386,36 +309,25 @@ const Videochat = () => {
     // socketio.on("user:joined", handleUserJoin);
     socketio.on("send-offer", handleSendOffer); // offer
     socketio.on("offer", handleOffer); // offer
-    socketio.on("answer", handleAnswer); // answer
+    socketio.on("answer", handleAnswer);  // answer
     socketio.on("lobby", handleLobby);
     socketio.on("add-ice-candidate", handleAddIceCandidate);
     socketio.on("remotedisconnect", handleRemoteDisconnect);
     socketio.on("user:skiped", handleSkipUser);
     socketio.on("getMessage", handleGetMessage);
     return () => {
-      socketio.off("room:join", handleJoinRoom);
+      socketio.off("room:join", handleJoinRoom)
       // socketio.off("user:joined", handleUserJoin)
       socketio.off("send-offer", handleSendOffer); // offer
       socketio.off("offer", handleOffer); // offer
-      socketio.off("answer", handleAnswer); // answer
+      socketio.off("answer", handleAnswer);  // answer
       socketio.off("lobby", handleLobby);
       socketio.off("add-ice-candidate", handleAddIceCandidate);
       socketio.off("remotedisconnect", handleRemoteDisconnect);
       socketio.off("user:skiped", handleSkipUser);
       socketio.off("getMessage", handleGetMessage);
     };
-  }, [
-    handleAddIceCandidate,
-    handleAnswer,
-    handleGetMessage,
-    handleJoinRoom,
-    handleLobby,
-    handleOffer,
-    handleRemoteDisconnect,
-    handleSendOffer,
-    handleSkipUser,
-    socketio,
-  ]);
+  }, [handleAddIceCandidate, handleAnswer, handleGetMessage, handleJoinRoom, handleLobby, handleOffer, handleRemoteDisconnect, handleSendOffer, handleSkipUser, socketio]);
 
   useEffect(() => {
     if (!mounted) return;
@@ -423,15 +335,10 @@ const Videochat = () => {
       if ((e.key == "r" || e.key == "R") && e.ctrlKey) {
         e.preventDefault();
       }
-    });
-    return () => {};
-  }, [mounted]);
-
-  useEffect(() => {
+    })
     return () => {
-      socketio.disconnect();
-    };
-  }, [socketio]);
+    }
+  }, [mounted])
 
   const sendData = useCallback(() => {
     if (socketio == null) {
@@ -443,36 +350,30 @@ const Videochat = () => {
     if (message.length <= 0 || roomId === null || roomId === undefined) {
       return;
     }
-    const sendmessage: MessageChatProps = { message: message, name: "You" };
-    setallmessages((oldmessage) => [...oldmessage, sendmessage]);
-    socketio.emit("sendMessage", { roomId, message });
+    const sendmessage: MessageChatProps = { message: message, name: "You" }
+    setallmessages((oldmessage) => [...oldmessage, sendmessage])
+    socketio.emit("sendMessage", { roomId, message })
     setmessage("");
-  }, [message, socketio, roomId, lobby]);
+  }, [message, socketio, roomId, lobby])
 
   const startRandomCall = useCallback(() => {
-    setallmessages([]);
-    setReceivingPc((receivingP) => {
-      if (
-        receivingP?.connectionState !== "failed" &&
-        receivingP?.connectionState !== "closed"
-      ) {
-        receivingP?.close();
-      }
-      return null;
-    });
-    setSendingPc((sendingP) => {
-      if (
-        sendingP?.connectionState !== "failed" &&
-        sendingP?.connectionState !== "closed"
-      ) {
-        sendingP?.close();
-      }
-      return null;
-    });
     if (socketio !== null) {
-      socketio?.emit("skip:user");
+      socketio?.emit("skip:user")
     }
-  }, [socketio]);
+    setallmessages([]);
+    setReceivingPc(() => {
+      if (receivingPc?.connectionState !== "failed" && receivingPc?.connectionState !== "closed") {
+        receivingPc?.close()
+      }
+      return null;
+    });
+    setSendingPc(() => {
+      if (sendingPc?.connectionState !== "failed" && sendingPc?.connectionState !== "closed") {
+        sendingPc?.close()
+      }
+      return null;
+    });
+  }, [receivingPc, sendingPc, socketio])
 
   if (!mounted) return;
 
@@ -482,60 +383,44 @@ const Videochat = () => {
         <div className="flex selection:bg-none select-none max-lg:flex-col">
           <div className="lg:h-screen relative h-[50vh] w-full lg:w-1/2">
             {/* <ReactPlayer url={src} playing /> */}
-            {!lobby ? (
-              <video
-                className=" bg-black transformvideo z-10 min-w-full object-cover min-h-full "
-                ref={remoteVideoRef}
-                loop={true}
-                playsInline
-                onContextMenu={(e) => {
-                  e.preventDefault();
-                }}
-                autoPlay={true}
-              ></video>
-            ) : (
-              <div className=" min-w-full bg-black flex items-center justify-center object-cover min-h-full">
-                <div>
-                  <h1 className="text-white text-lg">
-                    Connecting you with your interest
-                  </h1>
-                </div>
+            {!lobby ? <video
+              className=" bg-black z-10 min-w-full object-cover min-h-full "
+              ref={remoteVideoRef}
+              loop={true}
+              playsInline
+              onContextMenu={(e) => {
+                e.preventDefault()
+              }}
+              autoPlay={true}
+            >
+            </video> : <div className=" min-w-full bg-black flex items-center justify-center object-cover min-h-full">
+              <div>
+                <h1 className="text-white text-lg">Connecting you with your interest</h1>
               </div>
-            )}
-            {!videopermission && (
-              <div className="absolute top-[40%] w-full ">
-                <h1 className="font-bold text-xl break-words text-center text-white">
-                  You can't see video of other user if you disable your video
-                </h1>
-                <h1 className="font-bold text-xl break-words text-center text-white">
-                  Enable video and refresh page to talk to other people in world
-                </h1>
-              </div>
-            )}
+            </div>}
+            {!videopermission && <div className="absolute top-[40%] w-full ">
+              <h1 className="font-bold text-xl break-words text-center text-white">You can't see video of other user if you disable your video</h1>
+              <h1 className="font-bold text-xl break-words text-center text-white">Enable video and refresh page to talk to other people in world</h1>
+            </div>}
           </div>
           <div className="lg:h-screen relative h-[50vh] w-full lg:w-1/2">
             {/* <ReactPlayer url={src} playing /> */}
             <video
-              className=" bg-black transformvideo z-10 min-w-full object-cover min-h-full "
+              className=" bg-black z-10 min-w-full object-cover min-h-full "
               ref={localVideoRef}
               loop={true}
               playsInline
               onContextMenu={(e) => {
-                e.preventDefault();
+                e.preventDefault()
               }}
               autoPlay={true}
               muted={true}
-            ></video>
-            {!videopermission && (
-              <div className="absolute top-[40%] w-full ">
-                <h1 className="font-bold text-xl break-words text-center text-white">
-                  You can't see video of other user if you disable your video
-                </h1>
-                <h1 className="font-bold text-xl break-words text-center text-white">
-                  Enable video and refresh page to talk to other people in world
-                </h1>
-              </div>
-            )}
+            >
+            </video>
+            {!videopermission && <div className="absolute top-[40%] w-full ">
+              <h1 className="font-bold text-xl break-words text-center text-white">You can't see video of other user if you disable your video</h1>
+              <h1 className="font-bold text-xl break-words text-center text-white">Enable video and refresh page to talk to other people in world</h1>
+            </div>}
           </div>
           {/* <UserVideo videopermission={videopermission} src={remoteVideoRef.current?.srcObject} />
           <UserVideo videopermission={videopermission} src={localstream} /> */}
@@ -543,24 +428,17 @@ const Videochat = () => {
 
         <div className="lg:w-[50%] max-sm:w-full sm:w-[70%] overflow-x-hidden overflow-y-auto z-50 space-y-4 max-lg:max-w-full pb-4 justify-end h-[80vh] max-lg:h-[42vh]  absolute max-lg:left-0 lg:right-0 bottom-32 max-lg:bottom-20">
           {allmessages?.map((msg, ind) => {
-            return (
-              <div
-                key={ind}
-                className="sm:mx-6 md:mx-8 mx-3 bg-rose-500/20 break-words lg:w-[50%] px-2 py-2  rounded-lg"
-              >
-                <h1 className="text-white font-bold">Send by {msg?.name}</h1>
-                <h1 className="text-white font-medium">{msg?.message}</h1>
-              </div>
-            );
+            return (<div key={ind} className="sm:mx-6 md:mx-8 mx-3 bg-rose-500/20 break-words lg:w-[50%] px-2 py-2  rounded-lg">
+              <h1 className="text-white font-bold">Send by {msg?.name}</h1>
+              <h1 className="text-white font-medium">{msg?.message}</h1>
+            </div>);
           })}
+
         </div>
 
         <div className="fixed select-none lg:bottom-0 flex lg:flex-row max-lg:flex-col max-lg:top-0 lg:justify-around lg:items-center max-lg:w-full lg:w-[50%] left-0 z-50  lg:h-32 items-end max-lg:space-y-3">
-          <button
-            disabled={lobby}
-            onClick={startRandomCall}
-            className="lg:bg-green-300/50 font-bold lg:text-2xl lg:h-28 lg:shadow-lg disabled:lg:bg-green-300/20 shadow-green-600 lg:w-28 rounded-lg max-lg:mr-3 max-lg:mt-3"
-          >
+
+          <button disabled={lobby} onClick={startRandomCall} className="lg:bg-green-300/50 font-bold lg:text-2xl lg:h-28 lg:shadow-lg disabled:lg:bg-green-300/20 shadow-green-600 lg:w-28 rounded-lg max-lg:mr-3 max-lg:mt-3">
             <span className="hidden lg:block text-2xl text-white">Skip</span>
             <span className="lg:hidden">
               <SkipForward size={30} color="white" />
@@ -587,18 +465,8 @@ const Videochat = () => {
           </h1>
         </div>
         <div className="fixed flex lg:space-x-3 space-x-1  lg:px-7 px-2 items-center justify-center max-lg:w-full lg:h-32 h-20 bottom-0  lg:w-[50%] right-0 z-50">
-          <input
-            onChange={(e) => {
-              setmessage(e.target.value);
-            }}
-            value={message}
-            className="w-full  placeholder:text-slate-400 border border-rose-500 h-14 px-4 text-lg outline-none focus:outline-none rounded-lg"
-            placeholder="Chat here..."
-          />
-          <div
-            onClick={sendData}
-            className="h-[56px] lg:w-[60px] w-[64px] flex items-center justify-center bg-rose-500 cursor-pointer rounded-full"
-          >
+          <input onChange={(e) => { setmessage(e.target.value) }} value={message} className="w-full  placeholder:text-slate-400 border border-rose-500 h-14 px-4 text-lg outline-none focus:outline-none rounded-lg" placeholder="Chat here..." />
+          <div onClick={sendData} className="h-[56px] lg:w-[60px] w-[64px] flex items-center justify-center bg-rose-500 cursor-pointer rounded-full">
             <Send size={28} color="#fff" />
           </div>
         </div>
